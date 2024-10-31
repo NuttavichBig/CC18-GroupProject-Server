@@ -24,9 +24,10 @@ exports.getHotelById = async (req, res,next) => {
     }
 }
 exports.createHotel = async (req, res,next) => {
-    const { name, detail, img, address, lat, lng, star, checkInTime, checkOutTime, facilityHotel, phone, webPage } = req.body
+    const { name, detail, img, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage, partnerId } = req.body
     console.log(req.body)
     try{
+        
         const newHotel = await prisma.hotel.create({
             data:{
                 name,
@@ -36,13 +37,18 @@ exports.createHotel = async (req, res,next) => {
                 lat,
                 lng,
                 star,
-                checkInTime: checkInTime ? new Date(checkInTime) : new Date(),
-                checkOutTime: checkOutTime ? new Date(checkOutTime) : new Date(),
+                checkinTime: new Date(checkinTime),
+                checkoutTime: new Date(checkoutTime),
                 phone,
                 webPage,
-                facilitiesHotels:{
-                    create:facilityHotel
+                facilitiesHotel:{
+                    create:facilitiesHotel
                 },
+                partner: {
+                    connect: {
+                        id: Number(partnerId)
+                    }
+                }
             },
         })
         res.json(newHotel)
@@ -52,7 +58,7 @@ exports.createHotel = async (req, res,next) => {
 }
 exports.updateHotel = async (req, res,next) => {
     const {hotelId} = req.params
-    const { name, detail, img, address, lat, lng, star, checkInTime, checkOutTime, facilityHotel } = req.body
+    const { name, detail, img, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage, partnerId } = req.body
     try{
         const updatedHotel = await prisma.hotel.update({
             where:{ id: Number(hotelId) },
@@ -64,11 +70,13 @@ exports.updateHotel = async (req, res,next) => {
                 lat,
                 lng,
                 star,
-                checkInTime:new Date(checkInTime),
-                checkOutTime:new Date(checkOutTime),
-                facilitiesHotels:{
-                    create:facilityHotel
-                },
+                checkinTime: new Date(checkinTime),
+                checkoutTime: new Date(checkoutTime),
+                phone,
+                webPage,
+                facilitiesHotel:{
+                    create:facilitiesHotel
+                }
             },
         })
         res.json(updatedHotel)
