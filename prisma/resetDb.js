@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const prisma = require("../src/config/prisma")
+const prisma = require("../src/configs/prisma")
 const dbName = process.env.DATABASE_NAME
 
 async function run() {

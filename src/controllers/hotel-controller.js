@@ -1,4 +1,4 @@
-const prisma  = require("../configs/prima");
+const prisma  = require("../configs/prisma");
 const createError = require("../utility/createError");
 
 exports.getHotels = async (req, res, next) => {}
