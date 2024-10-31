@@ -1,10 +1,18 @@
 // Import
-const express = require("express");
-const cors = require("cors");
-const handleError = require("./src/middlewares/error");
-const handleNotFound = require("./src/middlewares/notFound");
-const { createServer } = require("node:http");
-const socketIo = require("socket.io");
+const express = require("express")
+const cors = require("cors")
+const handleError = require("./src/middlewares/error")
+const handleNotFound = require("./src/middlewares/notFound")
+const {createServer} = require("node:http")
+const socketIo = require("socket.io")
+
+// Route
+const hotelRoute = require("./src/routes/hotel-route")
+const roomRoute = require("./src/routes/room-route")
+const reviewRoute = require("./src/routes/review-route")
+const bookingRoute = require("./src/routes/booking-route")
+const promotionRoute = require("./src/routes/promotion-route")
+const partnerRoute = require("./src/routes/partner-route")
 const authRoutes = require("./src/routes/auth-route");
 
 // config
@@ -20,8 +28,16 @@ app.use(cors());
 app.use(express.json());
 
 // API Path
-
 app.use("/auth", authRoutes);
+app.use('/hotel',hotelRoute)
+app.use('/room',roomRoute) // authen
+app.use('/review',reviewRoute)
+app.use('/booking',bookingRoute)
+app.use('/promotion',promotionRoute)
+app.use('/partner',partnerRoute) // authen
+app.use('/admin',()=>{}) // authen
+
+
 
 // exit middlewares
 app.use("*", handleNotFound);
