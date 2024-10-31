@@ -1,51 +1,46 @@
 // Import
-const express = require("express")
-const cors = require("cors")
-const handleError = require("./src/middlewares/error")
-const handleNotFound = require("./src/middlewares/notFound")
-const {createServer} = require("node:http")
-const socketIo = require("socket.io")
-
+const express = require("express");
+const cors = require("cors");
+const handleError = require("./src/middlewares/error");
+const handleNotFound = require("./src/middlewares/notFound");
+const { createServer } = require("node:http");
+const socketIo = require("socket.io");
+const authRoutes = require("./src/routes/auth-route");
 
 // config
-require("dotenv").config()
-const app = express()
-const server = createServer(app)
-const io = socketIo(server,{
-    cors : {}
-})
+require("dotenv").config();
+const app = express();
+const server = createServer(app);
+const io = socketIo(server, {
+  cors: {},
+});
 
 // entry middlewares
-app.use(cors())
-app.use(express.json())
+app.use(cors());
+app.use(express.json());
 
 // API Path
 
+app.use("/auth", authRoutes);
 
 // exit middlewares
-app.use("*",handleNotFound)
-app.use(handleError)
-
+app.use("*", handleNotFound);
+app.use(handleError);
 
 // Socket Middleware
 
-
 // Socket Function
-io.on("connection",(socket)=>{
-    console.log(`User : ${socket.id} has connected`)
+io.on("connection", (socket) => {
+  console.log(`User : ${socket.id} has connected`);
 
-
-
-    // disconnect listener
-    socket.on("disconnect",()=>{
-        console.log(`USer : ${socket.id} has disconnected`)
-    })
-})
-
-
+  // disconnect listener
+  socket.on("disconnect", () => {
+    console.log(`USer : ${socket.id} has disconnected`);
+  });
+});
 
 // server listen
-const port = process.env.PORT || 8000
-server.listen(port,()=>{
-    console.log(`server is running on port ${port}`)
-})
+const port = process.env.PORT || 8000;
+server.listen(port, () => {
+  console.log(`server is running on port ${port}`);
+});
