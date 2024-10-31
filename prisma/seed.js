@@ -83,6 +83,16 @@ const userData = [
         gender : "MALE",
         role : "PARTNER",
     },
+    {
+      email : "admin10@mail.com",
+      password : hashedPassword,
+      firstName : "admin10",
+      lastName : "Popo",
+      phone : '0123456789',
+      gender : "MALE",
+      role : "PARTNER",
+  },
+
 
 ]
 
@@ -127,6 +137,14 @@ const partnerData = [
         bankName:"Bank2",
         bankAccount:"9876543219",
     },
+    {
+      companyName : "Partner6",
+      address:"address6",
+      userId:10,
+      taxNo:"523456789",
+      bankName:"Bank2",
+      bankAccount:"9876543219",
+  },
 ]
 const hotelData =[
     {
