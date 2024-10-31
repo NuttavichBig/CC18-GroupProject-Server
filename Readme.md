@@ -1,0 +1,18 @@
+# Travelcome api
+---
+## env guide
+
+PORT
+
+SECRET_KEY
+
+DATABASE_URL
+
+DATABASE_NAME
+
+CLOUDINARY_NAME
+
+CLOUDINARY_API_KEY        
+
+CLOUDINARY_API_SECRET
+
