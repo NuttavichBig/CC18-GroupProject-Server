@@ -6,10 +6,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "delDb": "node prisma/resetDb.js",
-    "pushDb" : "npx prisma db push",
-    "seedDb" : "npx prisma db seed",
-    "resetDB": "node prisma/resetDB.js"
+    "delDB": "node prisma/resetDB.js",
+    "pushDB" : "npx prisma db push",
+    "seedDB" : "npx prisma db seed",
+    "resetDB": "npm run delDB &&  npm run pushDB && npm run seedDB"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
