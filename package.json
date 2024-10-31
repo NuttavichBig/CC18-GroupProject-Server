@@ -11,6 +11,9 @@
     "seedDb" : "npx prisma db seed",
     "resetDb": "npm run delDb &&  npm run pushDb && npm run seedDb"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "author": "",
   "license": "ISC",
   "description": "",

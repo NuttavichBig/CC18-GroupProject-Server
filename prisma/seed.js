@@ -1,5 +1,5 @@
-const { check } = require("prisma")
-const prisma = require("../src/config/prisma")
+
+const prisma = require("../src/configs/prima")
 const bcrypt = require("bcryptjs")
 
 const hashedPassword = bcrypt.hashSync('123456',10)
