@@ -1,4 +1,3 @@
-
 const prisma = require("../src/configs/prima")
 const bcrypt = require("bcryptjs")
 
@@ -138,12 +137,13 @@ const hotelData =[
         lng:987456,
         partnerId:1,
         img:"https://picsum.photos/id/237/200/300",
-        checkinTime:"13:00",
-        checkoutTime:"12:00",
-        star:"5",
+        checkinTime:"2024-11-10T14:00:00Z",
+        checkoutTime:"2024-11-10T14:00:00Z",
+        star:5,
         phone:"0123456789",
         webPage:"www.hotel1.com",
         isActive:true,
+        facilitiesHotelId:1
     },
     {
         name:"Hotel2",
@@ -153,12 +153,13 @@ const hotelData =[
         lng:2987456,
         partnerId:2,
         img:"https://picsum.photos/id/237/200/300",
-        checkinTime:"13:00",
-        checkoutTime:"12:00",
-        star:"5",
+        checkinTime:"2024-11-10T14:00:00Z",
+        checkoutTime:"2024-11-10T14:00:00Z",
+        star:5,
         phone:"0123456789",
         webPage:"www.hotel1.com",
         isActive:true,
+        facilitiesHotelId:2
     },
     {
         name:"Hotel3",
@@ -168,12 +169,13 @@ const hotelData =[
         lng:3987456,
         partnerId:3,
         img:"https://picsum.photos/id/237/200/300",
-        checkinTime:"13:00",
-        checkoutTime:"12:00",
-        star:"5",
+        checkinTime:"2024-11-10T14:00:00Z",
+        checkoutTime:"2024-11-10T14:00:00Z",
+        star:5,
         phone:"0123456789",
         webPage:"www.hotel1.com",
         isActive:true,
+        facilitiesHotelId:3
     },
     {
         name:"Hotel4",
@@ -183,12 +185,13 @@ const hotelData =[
         lng:4987456,
         partnerId:4,
         img:"https://picsum.photos/id/237/200/300",
-        checkinTime:"13:00",
-        checkoutTime:"12:00",
-        star:"5",
+        checkinTime:"2024-11-10T14:00:00Z",
+        checkoutTime:"2024-11-10T14:00:00Z",
+        star:5,
         phone:"0123456789",
         webPage:"www.hotel1.com",
         isActive:true,
+        facilitiesHotelId:4
     },
     {
         name:"Hotel5",
@@ -198,12 +201,13 @@ const hotelData =[
         lng:5987456,
         partnerId:5,
         img:"https://picsum.photos/id/237/200/300",
-        checkinTime:"13:00",
-        checkoutTime:"12:00",
-        star:"5",
+        checkinTime:"2024-11-10T14:00:00Z",
+        checkoutTime:"2024-11-10T14:00:00Z",
+        star:5,
         phone:"0123456789",
         webPage:"www.hotel1.com",
         isActive:true,
+        facilitiesHotelId:5
     },
 ]
 
@@ -288,10 +292,6 @@ const roomData = [
       hotelId: 1,
       facilityRoomId: 1,
       roomAmount: 5,
-      images: [
-        { img: "https://picsum.photos/seed/picsum/200/300" },
-        { img: "https://picsum.photos/seed/picsum/200/300" }
-      ]
     },
     {
       name: "Room2",
@@ -304,10 +304,7 @@ const roomData = [
       hotelId: 1,
       facilityRoomId: 2,
       roomAmount: 3,
-      images: [
-        { img: "https://picsum.photos/seed/picsum/200/300" },
-        { img: "https://picsum.photos/seed/picsum/200/300" }
-      ]
+
     },
     {
       name: "Room3",
@@ -320,10 +317,6 @@ const roomData = [
       hotelId: 1,
       facilityRoomId: 3,
       roomAmount: 8,
-      images: [
-        { img: "https://picsum.photos/seed/picsum/200/300" },
-        { img: "https://picsum.photos/seed/picsum/200/300" }
-      ]
     },
     {
         name: "Room4",
@@ -334,12 +327,8 @@ const roomData = [
         recommendPeople: 4,
         size: 40.0,
         hotelId: 2,
-        facilityRoomId: 1,
+        facilityRoomId:4,
         roomAmount: 5,
-        images: [
-          { img: "https://picsum.photos/seed/picsum/200/300" },
-          { img: "https://picsum.photos/seed/picsum/200/300" }
-        ]
       },
       {
         name: "Room5",
@@ -350,12 +339,8 @@ const roomData = [
         recommendPeople: 6,
         size: 50.0,
         hotelId: 2,
-        facilityRoomId: 2,
+        facilityRoomId: 5,
         roomAmount: 3,
-        images: [
-          { img: "https://picsum.photos/seed/picsum/200/300" },
-          { img: "https://picsum.photos/seed/picsum/200/300" }
-        ]
       },
       {
         name: "Room6",
@@ -366,12 +351,8 @@ const roomData = [
         recommendPeople: 2,
         size: 20.0,
         hotelId: 3,
-        facilityRoomId: 3,
+        facilityRoomId: 6,
         roomAmount: 8,
-        images: [
-          { img: "https://picsum.photos/seed/picsum/200/300" },
-          { img: "https://picsum.photos/seed/picsum/200/300" }
-        ]
       },
       {
         name: "Room7",
@@ -382,12 +363,8 @@ const roomData = [
         recommendPeople: 4,
         size: 40.0,
         hotelId: 3,
-        facilityRoomId: 1,
+        facilityRoomId: 7,
         roomAmount: 5,
-        images: [
-          { img: "https://picsum.photos/seed/picsum/200/300" },
-          { img: "https://picsum.photos/seed/picsum/200/300" }
-        ]
       },
       {
         name: "Room8",
@@ -398,12 +375,8 @@ const roomData = [
         recommendPeople: 6,
         size: 50.0,
         hotelId: 4,
-        facilityRoomId: 2,
+        facilityRoomId: 8,
         roomAmount: 3,
-        images: [
-          { img: "https://picsum.photos/seed/picsum/200/300" },
-          { img: "https://picsum.photos/seed/picsum/200/300" }
-        ]
       },
       {
         name: "Room9",
@@ -414,12 +387,8 @@ const roomData = [
         recommendPeople: 2,
         size: 20.0,
         hotelId: 4,
-        facilityRoomId: 3,
+        facilityRoomId: 9,
         roomAmount: 8,
-        images: [
-          { img: "https://picsum.photos/seed/picsum/200/300" },
-          { img: "https://picsum.photos/seed/picsum/200/300" }
-        ]
       },
       {
         name: "Room10",
@@ -430,13 +399,31 @@ const roomData = [
         recommendPeople: 2,
         size: 20.0,
         hotelId: 5,
-        facilityRoomId: 3,
+        facilityRoomId: 10,
         roomAmount: 8,
-        images: [
-          { img: "https://picsum.photos/seed/picsum/200/300" },
-          { img: "https://picsum.photos/seed/picsum/200/300" }
-        ]
       }
+  ];
+  const roomImagesData = [
+    { img: "https://picsum.photos/seed/picsum/200/300", roomId: 1 },
+    { img: "https://picsum.photos/seed/picsum/200/301", roomId: 1 },
+    { img: "https://picsum.photos/seed/picsum/200/302", roomId: 2 },
+    { img: "https://picsum.photos/seed/picsum/200/303", roomId: 2 },
+    { img: "https://picsum.photos/seed/picsum/200/304", roomId: 2 },
+    { img: "https://picsum.photos/seed/picsum/200/305", roomId: 3 },
+    { img: "https://picsum.photos/seed/picsum/200/306", roomId: 3 },
+    { img: "https://picsum.photos/seed/picsum/200/307", roomId: 3 },
+    { img: "https://picsum.photos/seed/picsum/200/308", roomId: 4 },
+    { img: "https://picsum.photos/seed/picsum/200/309", roomId: 4 },
+    { img: "https://picsum.photos/seed/picsum/200/300", roomId: 5 },
+    { img: "https://picsum.photos/seed/picsum/200/301", roomId: 5 },
+    { img: "https://picsum.photos/seed/picsum/200/302", roomId: 6 },
+    { img: "https://picsum.photos/seed/picsum/200/303", roomId: 6 },
+    { img: "https://picsum.photos/seed/picsum/200/304", roomId: 7 },
+    { img: "https://picsum.photos/seed/picsum/200/305", roomId: 7 },
+    { img: "https://picsum.photos/seed/picsum/200/306", roomId: 8 },
+    { img: "https://picsum.photos/seed/picsum/200/307", roomId: 9 },
+    { img: "https://picsum.photos/seed/picsum/200/308", roomId: 10 },
+    { img: "https://picsum.photos/seed/picsum/200/309", roomId: 10 },
   ];
   
   const facilitiesRoomsData = [
@@ -662,10 +649,32 @@ const roomData = [
       endDate: new Date("2024-12-26")
     }
   ];
+  const userHavePromotionData = [
+    {promotionId:1,
+    userId:1,
+    isUsed: true
+    },
+    {promotionId:2,
+    userId:2,
+    isUsed: true
+    },
+    {promotionId:3,
+    userId:3,
+    isUsed: true
+    },
+    {promotionId:4,
+    userId:4,
+    isUsed: false
+    },
+    {promotionId:5,
+    userId:5,
+    isUsed: false
+    },
+  ]
   const bookingData = [
     {
       UUID: "uuid-12345",
-      status: "CONFIRMED",
+      status: "CONFIRM",
       totalPrice: 7500.00,
       checkinDate: new Date("2024-11-01"),
       checkoutDate: new Date("2024-11-05"),
@@ -675,7 +684,7 @@ const roomData = [
     },
     {
       UUID: "uuid-67890",
-      status: "PENDING",
+      status: "PENING",
       totalPrice: 4500.00,
       checkinDate: new Date("2024-12-01"),
       checkoutDate: new Date("2024-12-03"),
@@ -685,7 +694,7 @@ const roomData = [
     },
     {
       UUID: "uuid-11121",
-      status: "CANCELLED",
+      status: "CANCEL",
       totalPrice: 5000.00,
       checkinDate: new Date("2024-12-10"),
       checkoutDate: new Date("2024-12-15"),
@@ -695,7 +704,7 @@ const roomData = [
     },
     {
       UUID: "uuid-22232",
-      status: "CONFIRMED",
+      status: "CONFIRM",
       totalPrice: 8800.00,
       checkinDate: new Date("2024-12-20"),
       checkoutDate: new Date("2024-12-25"),
@@ -705,7 +714,7 @@ const roomData = [
     },
     {
       UUID: "uuid-33343",
-      status: "COMPLETED",
+      status: "REFUND",
       totalPrice: 9200.00,
       checkinDate: new Date("2025-01-10"),
       checkoutDate: new Date("2025-01-15"),
@@ -790,15 +799,17 @@ const roomData = [
   async function run() {
     await prisma.user.createMany({ data: userData })
     await prisma.partner.createMany({ data: partnerData })
+    await prisma.facilitiesHotel.createMany({ data: facilitiesHotelsData })
     await prisma.hotel.createMany({ data: hotelData })
-    await prisma.facilitiesHotels.createMany({ data: facilitiesHotelsData })
+    await prisma.facilitiesRoom.createMany({ data: facilitiesRoomsData })
     await prisma.room.createMany({ data: roomData })
-    await prisma.facilitiesRooms.createMany({ data: facilitiesRoomsData })
+    await prisma.roomImg.createMany({ data: roomImagesData })
     await prisma.promotion.createMany({ data: promotionData })
+    await prisma.userHavePromotion.createMany({ data: userHavePromotionData })
     await prisma.booking.createMany({ data: bookingData })
     await prisma.bookingRoom.createMany({ data: bookingRoomsData })
     await prisma.review.createMany({ data: reviewData })
-    await prisma.payments.createMany({ data: paymentsData })
+    await prisma.payment.createMany({ data: paymentsData })
 }
 
 run();
