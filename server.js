@@ -5,6 +5,8 @@ const handleError = require("./src/middlewares/error")
 const handleNotFound = require("./src/middlewares/notFound")
 const {createServer} = require("node:http")
 const socketIo = require("socket.io")
+const authenticate = require("./src/middlewares/authenticate")
+const checkRole = require("./src/middlewares/checkRole")
 
 // Route
 const hotelRoute = require("./src/routes/hotel-route")
@@ -14,6 +16,7 @@ const bookingRoute = require("./src/routes/booking-route")
 const promotionRoute = require("./src/routes/promotion-route")
 const partnerRoute = require("./src/routes/partner-route")
 const authRoutes = require("./src/routes/auth-route");
+const adminRoute = require("./src/routes/admin-route")
 
 // config
 require("dotenv").config();
@@ -30,12 +33,12 @@ app.use(express.json());
 // API Path
 app.use("/auth", authRoutes);
 app.use('/hotel',hotelRoute)
-app.use('/room',roomRoute) // authen
+app.use('/room',authenticate,checkRole.partnerCheck,roomRoute) // authen
 app.use('/review',reviewRoute)
 app.use('/booking',bookingRoute)
 app.use('/promotion',promotionRoute)
-app.use('/partner',partnerRoute) // authen
-app.use('/admin',()=>{}) // authen
+app.use('/partner',authenticate,partnerRoute) // authen
+app.use('/admin',authenticate,checkRole.adminCheck,adminRoute) // authen
 
 
 

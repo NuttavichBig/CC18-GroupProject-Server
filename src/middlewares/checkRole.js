@@ -1,4 +1,3 @@
-const prisma = require("../configs/prima");
 const createError = require("../utility/createError");
 
 exports.adminCheck = (req, res, next) => {

@@ -1,4 +1,4 @@
-const prisma = require("../src/configs/prima");
+const prisma = require("../src/configs/prisma");
 const bcrypt = require("bcryptjs");
 
 const hashedPassword = bcrypt.hashSync("123456", 10);
@@ -82,6 +82,15 @@ const userData = [
     gender: "MALE",
     role: "PARTNER",
   },
+  {
+    email: "admin10@mail.com",
+    password: hashedPassword,
+    firstName: "admin10",
+    lastName: "Popo",
+    phone: "0123456789",
+    gender: "MALE",
+    role: "PARTNER",
+  },
 ];
 
 const partnerData = [
@@ -121,6 +130,14 @@ const partnerData = [
     companyName: "Partner5",
     address: "address5",
     userId: 9,
+    taxNo: "523456789",
+    bankName: "Bank2",
+    bankAccount: "9876543219",
+  },
+  {
+    companyName: "Partner6",
+    address: "address6",
+    userId: 10,
     taxNo: "523456789",
     bankName: "Bank2",
     bankAccount: "9876543219",

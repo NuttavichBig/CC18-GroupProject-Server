@@ -1,7 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const createError = require("../utility/createError");
-const prisma = require("../configs/prima");
+
+const prisma = require("../configs/prisma");
 
 exports.register = async (req, res, next) => {
   try {
