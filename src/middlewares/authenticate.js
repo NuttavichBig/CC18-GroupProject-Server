@@ -29,9 +29,9 @@ module.exports = async (req, res, next) => {
     if (!findUser) {
       return createError(401, "Unauthorized");
     }
-    if (findUser.status === "BANNED" || findUser.status === "INACTIVE")
+    if (findUser.status === "BANNED" || findUser.status === "INACTIVE"){
       return createError(401, "Unauthorized");
-
+    }
     // delete password
     const { password, ...userData } = findUser;
     req.user = userData;
