@@ -33,3 +33,36 @@ exports.partnerCheck = (req, res, next) => {
     next(error);
   }
 };
+
+exports.userCheck = (req, res, next) => {
+  try {
+    const { role } = req.user;
+
+    if (!role) {
+      return createError(401, "Unauthorized");
+    }
+
+    if (role !== "USER") {
+      return createError(401, "Unauthorized");
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.nonUserCheck = (req, res, next) => {
+  try {
+    const { role } = req.user;
+
+    if (!role) {
+      return createError(401, "Unauthorized");
+    }
+    if (role === "USER") {
+      return createError(401, "Unauthorized");
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};

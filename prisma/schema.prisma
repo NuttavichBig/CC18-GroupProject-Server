@@ -31,7 +31,7 @@ model User {
 
 model Partner {
   id          Int      @id @default(autoincrement())
-  companyName String   @map("company_name")
+  companyName String   @unique @map("company_name")
   address     String
   userId      Int      @unique @map("user_id")
   taxNo       String   @map("tax_no")
@@ -39,7 +39,7 @@ model Partner {
   bankAccount String   @map("bank_account")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-  status      Status   @default(ACTIVE)
+  status      Status   @default(PENDING)
 
   user  User   @relation(fields: [userId], references: [id])
   hotel Hotel?
@@ -60,7 +60,7 @@ model Hotel {
   updatedAt    DateTime @updatedAt @map("updated_at")
   phone        String
   webPage      String?  @map("web_page")
-  isActive     Boolean  @default(true) @map("is_active")
+  isActive     Boolean  @default(false) @map("is_active")
   partnerId    Int      @unique @map("partner_id")
 
   rooms             Room[]
@@ -159,7 +159,7 @@ model UserHavePromotion {
   userId      Int     @map("user_id")
   isUsed      Boolean @default(false) @map("is_used")
 
-  promotion Promotion @relation(fields: [promotionId], references: [id])
+  promotion Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
   users     User      @relation(fields: [userId], references: [id])
   booking   Booking[]
 }
@@ -167,7 +167,7 @@ model UserHavePromotion {
 model Booking {
   id                  Int           @id @default(autoincrement())
   UUID                String        @unique @map("uuid")
-  status              BookingStatus @default(PENING)
+  status              BookingStatus @default(PENDING)
   totalPrice          Decimal       @map("total_price") @db.Decimal(10, 2)
   checkinDate         DateTime      @map("checkin_date")
   checkoutDate        DateTime      @map("checkout_date")
@@ -221,6 +221,7 @@ model Payment {
 }
 
 enum Status {
+  PENDING
   ACTIVE
   INACTIVE
   BANNED
@@ -238,15 +239,15 @@ enum RoomStatus {
 }
 
 enum RoomType {
-  SUITE
+  SINGLE
   DOUBLE
   MASTER
 }
 
 enum BookingStatus {
-  PENING
-  CONFIRM
-  CANCEL
+  PENDING
+  CONFIRMED
+  CANCELED
   FAILED
   REFUND
 }
