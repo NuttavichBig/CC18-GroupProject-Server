@@ -1,10 +1,11 @@
 const express = require("express")
 const router = express.Router()
+const promotionController = require("../controllers/promotion-controller")
 
 
-router.get('/',()=>{}) // query
-router.patch('/:promotionId',()=>{})
-router.post('/get',()=>{}) // authen
+router.get('/',promotionController.getAllPromotions) // query
+router.patch('/:promotionId',promotionController.getPromotionById)
+router.post('/get',promotionController.userGetPromotions) // authen
 
 
 
