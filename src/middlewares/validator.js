@@ -15,7 +15,6 @@ const adminObject = require("../configs/joi/admin-object")
 // validate function
 const validateSchema = (schema) => (req, res, next) => {
     try{
-
         const { value, error } = schema.validate(req.body)
         if (error) {
             return createError(400, error.details[0].message)
@@ -29,7 +28,6 @@ const validateSchema = (schema) => (req, res, next) => {
 
 const validateQuery = (schema) => (req, res, next) => {
     try{
-
         const { value, error } = schema.validate(req.query)
         if (error) {
             return createError(400, error.details[0].message)
@@ -80,3 +78,7 @@ module.exports.updatePartnerValidator = validateSchema(partnerObject.updatePartn
 module.exports.adminGetUserQueryValidator = validateQuery(adminObject.adminGetUserQuerySchema)
 module.exports.adminUpdateUserValidator = validateSchema(adminObject.adminUpdateUserSchema)
 module.exports.adminGetPartnerQueryValidator = validateQuery(adminObject.adminGetPartnerQuerySchema)
+module.exports.adminUpdatePartnerValidator = validateSchema(adminObject.adminUpdatePartnerSchema)
+module.exports.adminCreatePromotion = validateSchema(adminObject.adminCreatePromotionSchema)
+module.exports.adminUpdatePromotion = validateSchema(adminObject.adminUpdatePromotionSchema)
+module.exports.adminUpdateBookingValidator = validateSchema(adminObject.adminUpdateBookingSchema)
