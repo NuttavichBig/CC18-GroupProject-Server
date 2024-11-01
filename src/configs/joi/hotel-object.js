@@ -154,7 +154,7 @@ module.exports.createHotelSchema = Joi.object({
             'any.required': 'Star rating is required'
         }),
 
-    checkInTime: Joi
+    checkinTime: Joi
         .string()
         .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
         .required()
@@ -164,7 +164,7 @@ module.exports.createHotelSchema = Joi.object({
             'any.required': 'Check-in time is required'
         }),
 
-    checkOutTime: Joi.string()
+    checkoutTime: Joi.string()
         .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
         .required()
         .messages({
@@ -173,7 +173,7 @@ module.exports.createHotelSchema = Joi.object({
             'any.required': 'Check-out time is required'
         }),
 
-    facilityHotel: Joi
+    facilitiesHotel: Joi
         .object()
         .pattern(
             Joi.string(), // Keys must be strings
@@ -190,7 +190,21 @@ module.exports.createHotelSchema = Joi.object({
         .messages({
             'object.base': 'Facilities must be an object with boolean values',
             'any.required': 'Facilities are required'
-        })
+        }),
+        phone: Joi
+        .string()
+        .pattern(/^\d{10}$/)
+        .required()
+        .messages({
+            'string.pattern.base': 'Phone number must be exactly 10 digits.',
+            'any.required': 'Phone number are required'
+        }),
+        webPage : Joi
+        .string()
+        .optional()
+        .messages({
+            'string.pattern.base': 'Web page must be exactly 10 digits.'
+        }),
 });
 
 module.exports.updateHotelSchema = Joi.object({
@@ -254,7 +268,7 @@ module.exports.updateHotelSchema = Joi.object({
             'any.required': 'Star rating is required'
         }),
 
-    checkInTime: Joi
+    checkinTime: Joi
         .string()
         .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
         .required()
@@ -264,7 +278,7 @@ module.exports.updateHotelSchema = Joi.object({
             'any.required': 'Check-in time is required'
         }),
 
-    checkOutTime: Joi.string()
+    checkoutTime: Joi.string()
         .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
         .required()
         .messages({
@@ -273,7 +287,7 @@ module.exports.updateHotelSchema = Joi.object({
             'any.required': 'Check-out time is required'
         }),
 
-    facilityHotel: Joi
+    facilitiesHotel: Joi
         .object()
         .pattern(
             Joi.string(), // Keys must be strings
@@ -290,5 +304,12 @@ module.exports.updateHotelSchema = Joi.object({
         .messages({
             'object.base': 'Facilities must be an object with boolean values',
             'any.required': 'Facilities are required'
+        }),
+        phone: Joi
+        .string()
+        .pattern(/^\d{10}$/)
+        .required()
+        .messages({
+            'string.pattern.base': 'Phone number must be exactly 10 digits.'
         }),
 });
