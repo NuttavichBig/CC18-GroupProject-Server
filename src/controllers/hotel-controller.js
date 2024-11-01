@@ -1,7 +1,14 @@
 const prisma  = require("../configs/prisma");
 const createError = require("../utility/createError");
 
-exports.getHotels = async (req, res, next) => {}
+exports.getHotels = async (req, res, next) => {
+    try{
+        const hotels = await prisma.hotel.findMany()
+        res.json(hotels)
+    } catch(error){
+        next(error)
+    }
+}
 exports.getHotelById = async (req, res,next) => {
     const {hotelId} = req.params
     try{
