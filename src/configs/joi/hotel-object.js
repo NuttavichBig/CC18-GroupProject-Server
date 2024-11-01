@@ -154,7 +154,7 @@ module.exports.createHotelSchema = Joi.object({
             'any.required': 'Star rating is required'
         }),
 
-    checkInTime: Joi
+    checkinTime: Joi
         .string()
         .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
         .required()
@@ -164,7 +164,7 @@ module.exports.createHotelSchema = Joi.object({
             'any.required': 'Check-in time is required'
         }),
 
-    checkOutTime: Joi.string()
+    checkoutTime: Joi.string()
         .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
         .required()
         .messages({
@@ -173,7 +173,7 @@ module.exports.createHotelSchema = Joi.object({
             'any.required': 'Check-out time is required'
         }),
 
-    facilityHotel: Joi
+        facilitiesHotel: Joi
         .object()
         .pattern(
             Joi.string(), // Keys must be strings

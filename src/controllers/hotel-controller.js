@@ -1,9 +1,31 @@
 const prisma  = require("../configs/prisma");
 const createError = require("../utility/createError");
+const Joi = require("joi");
+const { getHotelQuerySchema,createHotelSchema,updateHotelSchema } = require("../configs/joi/hotel-object");
 
 exports.getHotels = async (req, res, next) => {
+    const {error, value} = getHotelQuerySchema.validate(req.query)
+    if(error){
+        return createError(400, error.details[0].message)
+    }
+    const {search,maxPrice,minPrice,star,orderBy,sortBy,facilities,limit,page,isActive} = value
+    const filterCondition = {
+        ...(search && { name: { contains: search } }),
+        ...(maxPrice && { price: { lte: maxPrice } }),  
+        ...(minPrice && { price: { gte: minPrice } }),
+        ...(star && { star: { equals: star } }),
+        ...(facilities && { facilitiesHotel: { some: { id: { in: facilities } } } }),
+        ...(isActive && { isActive: { equals: isActive } })
+    }
     try{
-        const hotels = await prisma.hotel.findMany()
+        const hotels = await prisma.hotel.findMany({
+            where: filterCondition,
+            orderBy: {
+                [sortBy]: orderBy
+            },
+            take: limit,
+            skip: (page - 1) * limit,
+        })
         res.json(hotels)
     } catch(error){
         next(error)
@@ -31,15 +53,17 @@ exports.getHotelById = async (req, res,next) => {
     }
 }
 exports.createHotel = async (req, res,next) => {
-    const { name, detail, img, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage, partnerId } = req.body
-    console.log(req.body)
+    const {error, value} = createHotelSchema.validate(req.body)
+    if(error){
+        return createError(400, error.details[0].message)
+    }
+    const {name, detail, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage, partnerId } = value
     try{
         
         const newHotel = await prisma.hotel.create({
             data:{
                 name,
                 detail,
-                img,
                 address,
                 lat,
                 lng,
