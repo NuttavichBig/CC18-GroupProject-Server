@@ -14,9 +14,6 @@
   "prisma": {
     "seed": "node prisma/seed.js"
   },
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  },
   "author": "",
   "license": "ISC",
   "description": "",
