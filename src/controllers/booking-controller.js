@@ -2,21 +2,33 @@ const prisma = require("../configs/prisma")
 const createError = require("../utility/createError")
 
 exports.getAllBookings = async (req, res, next) => {
-    const { search, page = 1, limit = 10, orderBy = 'createdAt', sortBy = 'desc' } = req.query;
+    const { search, page = 1, limit = 10, orderBy = 'createdAt', sortBy = 'desc' } = req.query
     const skip = (page - 1) * limit;
-    const userId = req.user.id
-  
+    const userId = req.user? req.user.id : null
+    const userRole = req.user ? req.user.role : null
+
     try {
+      let checkUser = {}
+      if(userRole === 'ADMIN') {
+        checkUser = {}
+      } else if (userId) {
+        checkUser = {
+          userId : userId
+        }
+      } else{
+        checkUser = {}
+      }
+
       const bookings = await prisma.booking.findMany({
         where: {
-          userId: userId,
+          ...checkUser,
           ...(search && { OR: [
-            { hotels: { name: { contains: search, mode: 'insensitive' } } },
-            { UUID: { contains: search, mode: 'insensitive' } }
+            { hotels: { name: { contains: search } } }, 
+            { UUID: { contains: search } } 
           ] })
         },
-        skip: parseInt(skip),
-        take: parseInt(limit),
+        skip: Number(skip),
+        take: Number(limit),
         orderBy: { [orderBy]: sortBy },
         include: {
           hotels: true,
@@ -25,19 +37,19 @@ exports.getAllBookings = async (req, res, next) => {
       });
 
       const totalBookings = await prisma.booking.count({
-        where: { userId: userId }
+        where: checkUser
       });
       
       res.json({
         total: totalBookings,
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: Number(page),
+        limit: Number(limit),
         data: bookings,
       });
     } catch (error) {
       next(error);
     }
-  };
+  }
   exports.getBookingByUUID = async (req, res, next) => {
     const { UUID } = req.params;
   
