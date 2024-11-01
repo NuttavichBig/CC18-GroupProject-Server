@@ -4,7 +4,7 @@ const promotionController = require("../controllers/promotion-controller")
 
 
 router.get('/',promotionController.getAllPromotions) // query
-router.patch('/:promotionId',promotionController.getPromotionById)
+router.get('/:promotionId',promotionController.getPromotionById)
 router.post('/get',promotionController.userGetPromotions) // authen
 
 
