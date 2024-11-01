@@ -4,15 +4,15 @@ const createError = require("../utility/createError")
 exports.getAllBookings = async (req, res, next) => {
     const { search, page = 1, limit = 10, orderBy = 'createdAt', sortBy = 'desc' } = req.query;
     const skip = (page - 1) * limit;
-    const userId = req.user.id
+    // const userId = req.user.id
   
     try {
       const bookings = await prisma.booking.findMany({
         where: {
-          userId: userId,
+          // userId: userId,
           ...(search && { OR: [
-            { hotels: { name: { contains: search, mode: 'insensitive' } } },
-            { UUID: { contains: search, mode: 'insensitive' } }
+            { hotels: { name: { contains: search } } }, 
+            { UUID: { contains: search } } 
           ] })
         },
         skip: parseInt(skip),
@@ -25,7 +25,7 @@ exports.getAllBookings = async (req, res, next) => {
       });
 
       const totalBookings = await prisma.booking.count({
-        where: { userId: userId }
+        // where: { userId: userId }
       });
       
       res.json({

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const createError = require("../utility/createError")
-const prisma = require("../config/prisma")
+const prisma = require("../configs/prisma")
 
 
 module.exports = async (req, res, next) => {
