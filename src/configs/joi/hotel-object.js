@@ -204,7 +204,7 @@ module.exports.createHotelSchema = Joi.object({
         .optional()
         .messages({
             'string.pattern.base': 'Web page must be exactly 10 digits.'
-        }),
+        })
 });
 
 module.exports.updateHotelSchema = Joi.object({
@@ -312,4 +312,16 @@ module.exports.updateHotelSchema = Joi.object({
         .messages({
             'string.pattern.base': 'Phone number must be exactly 10 digits.'
         }),
+        webPage : Joi
+        .string()
+        .optional()
+        .messages({
+            'string.pattern.base': 'Web page must be exactly 10 digits.'
+        }),
+        img: Joi
+        .string()
+        .optional()
+        .messages({
+            'string.base': 'Image must be a string'
+        })
 });
