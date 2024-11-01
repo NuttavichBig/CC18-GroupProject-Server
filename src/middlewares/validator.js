@@ -14,21 +14,31 @@ const adminObject = require("../configs/joi/admin-object")
 
 // validate function
 const validateSchema = (schema) => (req, res, next) => {
-    const { value, error } = schema.validate(req.body)
-    if (error) {
-        return createError(400, error.details[0].message)
+    try{
+
+        const { value, error } = schema.validate(req.body)
+        if (error) {
+            return createError(400, error.details[0].message)
+        }
+        req.input = value
+        next();
+    }catch(err){
+        next(err)
     }
-    req.input = value
-    next();
 }
 
 const validateQuery = (schema) => (req, res, next) => {
-    const { value, error } = schema.validate(req.query)
-    if (error) {
-        return createError(400, error.details[0].message)
+    try{
+
+        const { value, error } = schema.validate(req.query)
+        if (error) {
+            return createError(400, error.details[0].message)
+        }
+        req.input = value
+        next();
+    }catch(err){
+        next(err)
     }
-    req.input = value
-    next();
 }
 
 
@@ -65,3 +75,8 @@ module.exports.userGetPromotionValidator = validateSchema(promotionObject.userGe
 // partner
 module.exports.createPartnerValidator = validateSchema(partnerObject.createPartnerSchema)
 module.exports.updatePartnerValidator = validateSchema(partnerObject.updatePartnerSchema)
+
+// admin
+module.exports.adminGetUserQueryValidator = validateQuery(adminObject.adminGetUserQuerySchema)
+module.exports.adminUpdateUserValidator = validateSchema(adminObject.adminUpdateUserSchema)
+module.exports.adminGetPartnerQueryValidator = validateQuery(adminObject.adminGetPartnerQuerySchema)
