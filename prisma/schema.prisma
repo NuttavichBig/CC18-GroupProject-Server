@@ -97,7 +97,7 @@ model RoomImg {
   img    String
   roomId Int    @map("room_id")
 
-  room Room @relation(fields: [roomId], references: [id])
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
 }
 
 model FacilitiesHotel {
@@ -186,13 +186,13 @@ model Booking {
 }
 
 model BookingRoom {
-  id         Int @id @default(autoincrement())
-  bookingId  Int @map("booking_id")
-  roomId     Int @map("room_id")
-  amountRoom Int @map("amount_room")
+  id         Int  @id @default(autoincrement())
+  bookingId  Int  @map("booking_id")
+  roomId     Int? @map("room_id")
+  amountRoom Int  @map("amount_room")
 
   booking Booking @relation(fields: [bookingId], references: [id])
-  rooms   Room    @relation(fields: [roomId], references: [id])
+  rooms   Room?   @relation(fields: [roomId], references: [id], onDelete: SetNull)
 }
 
 model Review {
