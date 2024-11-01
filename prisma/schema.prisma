@@ -51,8 +51,8 @@ model Hotel {
   detail       String   @map("detail") @db.Text
   address      String
   img          String
-  checkinTime  DateTime @map("checkin_time")
-  checkoutTime DateTime @map("checkout_time")
+  checkinTime  String @map("checkin_time")
+  checkoutTime String @map("checkout_time")
   lat          Float
   lng          Float
   star         Int?

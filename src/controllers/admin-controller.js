@@ -1,5 +1,7 @@
 const prisma = require("../configs/prisma")
+const checkPromotionByCode = require("../services/check-promotion-by-code")
 const createError = require("../utility/createError")
+const generatePromotionCode = require("../utility/generatePromotionCode")
 
 //user
 exports.getAllUsers = async (req, res, next) => {
@@ -71,31 +73,14 @@ exports.updatePartnerStatus = async(req,res,next)=>{
     }
 }
 
-//promotion
-const generateRandomCode = () => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    let randomCode = ''
-    for (let i = 0; i < 8; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length)
-        randomCode += characters.charAt(randomIndex)
-    }
-    return randomCode
-}
-const isCodeUnique = async (code) => {
-    const existingPromotion = await prisma.promotion.findFirst({
-        where: {
-            code
-        }
-    })
-    return !existingPromotion
-}
+
 exports.createPromotion = async (req, res, next) => {
     const {name,img,description,discountPercent,discountValue,minimumSpend,maxDiscount,usageLimit,userLimit,isActive,startDate,endDate} = req.body
     try {
         let newCode 
         do{
-            newCode = generateRandomCode(8)
-        }while(!(await isCodeUnique(newCode)))
+            newCode = generatePromotionCode()
+        }while(!!(await checkPromotionByCode(newCode)))
         const newPromotion = await prisma.promotion.create({
             data: {
                 name,
