@@ -2,13 +2,23 @@ const prisma = require("../configs/prisma")
 const createError = require("../utility/createError")
 
 exports.getAllBookings = async (req, res, next) => {
-    const { search, page = 1, limit = 10, orderBy = 'createdAt', sortBy = 'desc' } = req.query;
+    const { search, page = 1, limit = 10, orderBy = 'createdAt', sortBy = 'desc' } = req.query
     const skip = (page - 1) * limit;
-    const userId = req.user.id
-    const userRole = req.user.role
+    const userId = req.user? req.user.id : null
+    const userRole = req.user ? req.user.role : null
 
     try {
-      const checkUser = userRole === "ADMIN" ?{} : { userId: userId }
+      let checkUser = {}
+      if(userRole === 'ADMIN') {
+        checkUser = {}
+      } else if (userId) {
+        checkUser = {
+          userId : userId
+        }
+      } else{
+        checkUser = {}
+      }
+
       const bookings = await prisma.booking.findMany({
         where: {
           ...checkUser,
@@ -39,7 +49,7 @@ exports.getAllBookings = async (req, res, next) => {
     } catch (error) {
       next(error);
     }
-  };
+  }
   exports.getBookingByUUID = async (req, res, next) => {
     const { UUID } = req.params;
   

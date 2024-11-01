@@ -35,7 +35,7 @@ app.use("/auth", authRoutes);
 app.use('/hotel',hotelRoute)
 app.use('/room',authenticate,checkRole.partnerCheck,roomRoute) // authen
 app.use('/review',reviewRoute)
-app.use('/booking',authenticate,bookingRoute)
+app.use('/booking',bookingRoute)
 app.use('/promotion',promotionRoute)
 app.use('/partner',authenticate,partnerRoute) // authen
 app.use('/admin',authenticate,checkRole.adminCheck,adminRoute) // authen
