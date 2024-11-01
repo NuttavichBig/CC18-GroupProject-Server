@@ -1,22 +1,22 @@
 // Import
-const express = require("express")
-const cors = require("cors")
-const handleError = require("./src/middlewares/error")
-const handleNotFound = require("./src/middlewares/notFound")
-const {createServer} = require("node:http")
-const socketIo = require("socket.io")
-const authenticate = require("./src/middlewares/authenticate")
-const checkRole = require("./src/middlewares/checkRole")
+const express = require("express");
+const cors = require("cors");
+const handleError = require("./src/middlewares/error");
+const handleNotFound = require("./src/middlewares/notFound");
+const { createServer } = require("node:http");
+const socketIo = require("socket.io");
+const authenticate = require("./src/middlewares/authenticate");
+const checkRole = require("./src/middlewares/checkRole");
 
 // Route
-const hotelRoute = require("./src/routes/hotel-route")
-const roomRoute = require("./src/routes/room-route")
-const reviewRoute = require("./src/routes/review-route")
-const bookingRoute = require("./src/routes/booking-route")
-const promotionRoute = require("./src/routes/promotion-route")
-const partnerRoute = require("./src/routes/partner-route")
+const hotelRoute = require("./src/routes/hotel-route");
+const roomRoute = require("./src/routes/room-route");
+const reviewRoute = require("./src/routes/review-route");
+const bookingRoute = require("./src/routes/booking-route");
+const promotionRoute = require("./src/routes/promotion-route");
+const partnerRoute = require("./src/routes/partner-route");
 const authRoutes = require("./src/routes/auth-route");
-const adminRoute = require("./src/routes/admin-route")
+const adminRoute = require("./src/routes/admin-route");
 
 // config
 require("dotenv").config();
@@ -32,15 +32,13 @@ app.use(express.json());
 
 // API Path
 app.use("/auth", authRoutes);
-app.use('/hotel',hotelRoute)
-app.use('/room',authenticate,checkRole.partnerCheck,roomRoute) // authen
-app.use('/review',reviewRoute)
-app.use('/booking',bookingRoute)
-app.use('/promotion',promotionRoute)
-app.use('/partner',authenticate,partnerRoute) // authen
-app.use('/admin',authenticate,checkRole.adminCheck,adminRoute) // authen
-
-
+app.use("/hotel", hotelRoute);
+app.use("/room", authenticate, checkRole.partnerCheck, roomRoute); // authen
+app.use("/review", reviewRoute);
+app.use("/booking", bookingRoute);
+app.use("/promotion", promotionRoute);
+app.use("/partner", authenticate, partnerRoute); // authen
+app.use("/admin", authenticate, checkRole.adminCheck, adminRoute); // authen
 
 // exit middlewares
 app.use("*", handleNotFound);

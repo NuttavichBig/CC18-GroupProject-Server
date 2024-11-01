@@ -1,6 +1,6 @@
 const createError = require("../utility/createError");
 const path = require("path");
-const prisma = require("../configs/prima");
+const prisma = require("../configs/prisma");
 const fs = require("fs");
 const cloudinary = require("../configs/cloudinary");
 
