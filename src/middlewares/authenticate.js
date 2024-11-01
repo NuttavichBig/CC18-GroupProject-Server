@@ -22,7 +22,7 @@ module.exports = async (req, res, next) => {
 
 
         // verify
-        const payload = jwt.verify(token, process.env.JWT_SR_KEY)
+        const payload = jwt.verify(token, process.env.SECRET_KEY)
 
 
         // check user
