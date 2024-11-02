@@ -1,7 +1,5 @@
 const prisma  = require("../configs/prisma");
 const createError = require("../utility/createError");
-const Joi = require("joi");
-const { getHotelQuerySchema,createHotelSchema,updateHotelSchema } = require("../configs/joi/hotel-object")
 const cloudinary = require("../configs/cloudinary")
 const fs = require("fs")
 const path = require("path")
