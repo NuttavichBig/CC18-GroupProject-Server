@@ -138,21 +138,21 @@ exports.forgetPassword = async (req, res, next) => {
       service: 'gmail',
       auth: {
         user: 'cc18hotelbook@gmail.com',
-        pass: '@cc18G06'
+        pass: 'qgsfjdpcajvdfxkt'
       }
     });
     const mailOptions = {
       from: 'cc18hotelbook@gmail.com',
       to: email,
       subject: 'Hotel book account reset password',
-      text: `http://localhost:5703/reset-password/${token}`
+      text: `this is reset password link for your account http://localhost:5703/reset-password/${token}`
     };
-    transporter.sendMail(mailOptions, (error, info) => {
+    transporter.sendMail(mailOptions, async(error, info) => {
       if (error) {
         console.log(error);
       } else {
         console.log('Email sent: ' + info.response);
-        prisma.user.update({
+        await prisma.user.update({
           where : {
             id : user.id
           },
@@ -164,7 +164,7 @@ exports.forgetPassword = async (req, res, next) => {
     });
 
 
-    res.json({message : 'Please check your email'})
+    res.json({message : 'Please check your email',token})
 
   } catch (err) {
     next(err);
@@ -186,11 +186,19 @@ exports.resetPassword = async (req, res, next) => {
     }
 
     // check password 
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    const user = await prisma.user.findUnique({
+      where : {
+        id : req.user.id
+      },select:{
+        password : true
+      }
+    })
+    const isPasswordMatch = await bcrypt.compare(password,user.password);
     if (isPasswordMatch) {
       return createError(400, "You can't use old password");
     }
 
+    // hash then change
     const hashPassword = await bcrypt.hash(password,10);
     await prisma.user.update({
       where : {
