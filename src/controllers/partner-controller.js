@@ -26,7 +26,8 @@ exports.getPartnerInfo = async (req, res, next) => {
 exports.createPartner = async (req, res, next) => {
   try {
     const { id } = req.user;
-    const { companyName, address, taxNo, bankName, bankAccount } = req.body;
+    const { companyName, address, taxNo, bankName, bankAccount } = req.input;
+    console.log("1")
     const partner = await prisma.partner.findFirst({
       where: {
         userId: Number(id),
@@ -43,8 +44,8 @@ exports.createPartner = async (req, res, next) => {
       },
     });
 
-    if (company.companyName === companyName) {
-      return createError(400, "Already have company name");
+    if (company) {
+      return createError(400, "Already have this company");
     }
 
     const newPartner = await prisma.partner.create({

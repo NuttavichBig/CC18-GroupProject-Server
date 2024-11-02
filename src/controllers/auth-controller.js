@@ -15,7 +15,7 @@ exports.register = async (req, res, next) => {
       phone,
       gender,
       birthdate,
-    } = req.body;
+    } = req.input;
 
     const isUserExist = await prisma.user.findUnique({
       where: {
@@ -52,7 +52,7 @@ exports.register = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.input;
     const user = await prisma.user.findUnique({
       where: {
         email,
@@ -98,9 +98,48 @@ exports.currentUser = async (req, res, next) => {
         id: Number(id),
       },
     });
-    const { password: ps, createdAt, updatedAt, ...userData } = user;
+    const {
+      password: ps,
+      createdAt,
+      updatedAt,
+      resetPasswordToken,
+      googleId,
+      status,
+      ...userData
+    } = user;
     res.json({ user: userData });
   } catch (err) {
     next(err);
+  }
+};
+
+exports.editProfile = async (req, res, next) => {
+  try {
+    const id = req.user.id;
+    const { firstName, lastName, phone, gender, birthdate } = req.input;
+    const updateProfile = await prisma.user.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        firstName,
+        lastName,
+        phone,
+        gender,
+        birthdate,
+      },
+    });
+    const {
+      password: ps,
+      createdAt,
+      updatedAt,
+      resetPasswordToken,
+      googleId,
+      status,
+      ...userData
+    } = updateProfile;
+    res.json(userData);
+  } catch (error) {
+    next(error);
   }
 };
