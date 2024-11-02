@@ -2,7 +2,7 @@ const prisma = require("../configs/prisma")
 const createError = require("../utility/createError")
 
 exports.getAllBookings = async (req, res, next) => {
-    const { search, page = 1, limit = 10, orderBy = 'createdAt', sortBy = 'desc' } = req.query
+    const { search, page, limit, orderBy, sortBy } = req.input
     const skip = (page - 1) * limit;
     const userId = req.user? req.user.id : null
     const userRole = req.user ? req.user.role : null
@@ -27,9 +27,9 @@ exports.getAllBookings = async (req, res, next) => {
             { UUID: { contains: search } } 
           ] })
         },
-        skip: Number(skip),
-        take: Number(limit),
-        orderBy: { [orderBy]: sortBy },
+        skip,
+        take:limit,
+        orderBy: { [sortBy]: orderBy },
         include: {
           hotels: true,
           users: true,
@@ -42,8 +42,8 @@ exports.getAllBookings = async (req, res, next) => {
       
       res.json({
         total: totalBookings,
-        page: Number(page),
-        limit: Number(limit),
+        page,
+        limit,
         data: bookings,
       });
     } catch (error) {
@@ -72,7 +72,7 @@ exports.getAllBookings = async (req, res, next) => {
     }
   };
   exports.createBooking = async (req, res, next) => {
-    const { userId, promotionId, totalPrice, checkInDate, checkOutDate, hotelId } = req.body
+    const { userId, promotionId, totalPrice, checkInDate, checkOutDate, hotelId } = req.input
   
     try {
 
