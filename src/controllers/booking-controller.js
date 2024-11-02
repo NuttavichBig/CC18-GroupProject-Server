@@ -15,8 +15,6 @@ exports.getAllBookings = async (req, res, next) => {
         checkUser = {
           userId : userId
         }
-      } else if (UUID){
-        checkUser = {UUID: UUID}
       } else{
         return res.json({total: 0, page, limit, data: []})
       }

@@ -7,7 +7,7 @@ exports.getAllPromotions = async (req, res, next) => {
 
     const allowedOrder = ["id","name","startDate","endDate","isActive","discountValue","discountPercent","minimumSpend","maxDiscount","usageLimit","createdAt","updatedAt"]
     const orderField = allowedOrder.includes(sortBy) ? sortBy : "id"
-    const orderDirection = sortBy.toLowerCase()==="desc"?"desc":"asc"
+    const orderDirection = orderBy.toLowerCase()==="desc"?"desc":"asc"
     try {
         const promotions = await prisma.promotion.findMany({
             where: {
