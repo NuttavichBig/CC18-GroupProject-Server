@@ -4,12 +4,13 @@ const hotelController = require("../controllers/hotel-controller")
 const authenticate = require("../middlewares/authenticate")
 const checkRole = require("../middlewares/checkRole")
 const upload = require("../middlewares/upload")
+const {getHotelQueryValidator,createHotelValidator,updateHotelValidator} = require("../middlewares/validator")
 
 
-router.get('/',hotelController.getHotels) // query
+router.get('/',getHotelQueryValidator,hotelController.getHotels) // query
 router.get('/:hotelId',hotelController.getHotelById)
-router.post('/',authenticate,checkRole.partnerCheck,upload.single("img"),hotelController.createHotel) // authen
-router.patch('/:hotelId',authenticate,checkRole.partnerCheck,upload.single("img"),hotelController.updateHotel) // authen
+router.post('/',authenticate,checkRole.partnerCheck,upload.single("img"),createHotelValidator,hotelController.createHotel) // authen
+router.patch('/:hotelId',authenticate,checkRole.partnerCheck,upload.single("img"),updateHotelValidator,hotelController.updateHotel) // authen
 router.delete('/:hotelId',authenticate,checkRole.partnerCheck,hotelController.deleteHotel) // authen
 
 
