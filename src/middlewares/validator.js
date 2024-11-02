@@ -38,7 +38,8 @@ const validateQuery = (schema) => (req, res, next) => {
 module.exports.registerValidator = validateSchema(authObject.registerSchema)
 module.exports.loginValidator = validateSchema(authObject.loginSchema)
 module.exports.updateUserValidator = validateSchema(authObject.updateUserSchema)
-module.exports.forgetPasswordValidator = validateSchema(authObject.forgetPasswordSchema)
+module.exports.forgotPasswordValidator = validateSchema(authObject.forgotPasswordSchema)
+module.exports.resetPasswordValidator = validateSchema(authObject.resetPasswordSchema)
 
 // hotel
 module.exports.getHotelQueryValidator = validateQuery(hotelObject.getHotelQuerySchema)
