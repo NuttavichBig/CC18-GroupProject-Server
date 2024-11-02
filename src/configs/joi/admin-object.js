@@ -65,7 +65,7 @@ module.exports.adminGetUserQuerySchema = Joi.object({
 module.exports.adminUpdateUserSchema = Joi.object({
     role: Joi
         .string()
-        .valid('USER', 'PARTNER')
+        .valid('USER','ADMIN' ,'PARTNER')
         .required()
         .messages({
             "string.empty": "Email is required.",

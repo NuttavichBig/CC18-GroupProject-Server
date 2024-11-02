@@ -1,12 +1,40 @@
+
 const prisma = require("../configs/prisma")
 const checkPromotionByCode = require("../services/check-promotion-by-code")
-const createError = require("../utility/createError")
+const createError = require("../utility/createError") 
 const generatePromotionCode = require("../utility/generatePromotionCode")
 
 //user
 exports.getAllUsers = async (req, res, next) => {
     try {
-        const users = await prisma.user.findMany({})
+        const {search,limit,page,orderBy,sortBy,role,status} = req.input
+        // make condition variable
+        const condition = {
+            take : limit,
+            skip : (page-1)*limit,
+            orderBy : {[sortBy] : orderBy}
+        }
+        
+        // check search
+        if(search){
+            condition.where = {
+                OR : [
+                    {email : {contains : search}},
+                    {firstName : {contains : search}},
+                    {lastName : {contains : search}},
+                    {phone : {contains : search}}
+                ]
+            }
+        }
+
+        // check have other query?
+        if(role){
+            condition.where = { ...condition.where,role}
+        }
+        if(status){
+            condition.where = { ...condition.where,status}
+        }
+        const users = await prisma.user.findMany(condition)
         res.json(users)   
     } catch (error) {
         next(error)
@@ -14,7 +42,7 @@ exports.getAllUsers = async (req, res, next) => {
 }
 exports.updateUser = async (req, res, next) => {
     const { userId } = req.params
-    const { role } = req.body
+    const { role } = req.input
     try {
         const updateUser = await prisma.user.update({
             where: {
@@ -24,7 +52,8 @@ exports.updateUser = async (req, res, next) => {
                 role
             }
         })
-        res.json(updateUser)
+        const {resetPasswordToken,password,...user} = updateUser
+        res.json({message : "update completed",user})
     } catch (error) {
         next(error)
     }
@@ -32,12 +61,16 @@ exports.updateUser = async (req, res, next) => {
 exports.deleteUser = async (req, res, next) => {
     const { userId } = req.params
     try {
-        const deletedUser = await prisma.user.delete({
+        const deletedUser = await prisma.user.update({
             where: {
                 id: Number(userId)
+            },
+            data :{
+                status : 'BANNED'
             }
         })
-        res.json(deletedUser)
+        const {resetPasswordToken,password,...user} = deletedUser
+        res.json({message : "User has been terminate" ,user})
     } catch (error) {
         next(error)
     }
