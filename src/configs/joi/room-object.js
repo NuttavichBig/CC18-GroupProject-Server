@@ -17,7 +17,7 @@ module.exports.createRoomSchema = Joi.object({
         .messages({
             'string.base': 'Detail must be a string'
         }),
-    bedType: Joi
+    type: Joi
         .string()
         .valid('SUITE', 'DOUBLE', 'MASTER')
         .required()
