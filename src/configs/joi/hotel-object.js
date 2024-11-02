@@ -312,4 +312,10 @@ module.exports.updateHotelSchema = Joi.object({
         .messages({
             'string.pattern.base': 'Phone number must be exactly 10 digits.'
         }),
+        webPage : Joi
+        .string()
+        .optional()
+        .messages({
+            'string.pattern.base': 'Web page must be exactly 10 digits.'
+        }),
 });

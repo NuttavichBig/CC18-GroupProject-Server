@@ -1,5 +1,5 @@
 const createError = require("../utility/createError")
-
+const Joi =require("joi")
 
 
 // Joi Object
@@ -14,29 +14,21 @@ const adminObject = require("../configs/joi/admin-object")
 
 // validate function
 const validateSchema = (schema) => (req, res, next) => {
-    try{
         const { value, error } = schema.validate(req.body)
         if (error) {
             return createError(400, error.details[0].message)
         }
         req.input = value
         next();
-    }catch(err){
-        next(err)
-    }
 }
 
 const validateQuery = (schema) => (req, res, next) => {
-    try{
         const { value, error } = schema.validate(req.query)
         if (error) {
             return createError(400, error.details[0].message)
         }
         req.input = value
         next();
-    }catch(err){
-        next(err)
-    }
 }
 
 

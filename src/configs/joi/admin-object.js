@@ -1,6 +1,4 @@
-const { join } = require("@prisma/client/runtime/library")
 const Joi = require("joi")
-
 
 // admin path
 module.exports.adminGetUserQuerySchema = Joi.object({
@@ -218,7 +216,7 @@ module.exports.adminCreatePromotionSchema = Joi.object({
     isActive: Joi
         .boolean()
         .default(false)
-        .message({
+        .messages({
             'boolean.base': 'Is active must be a  boolean'
         }),
     startDate: Joi
@@ -226,7 +224,7 @@ module.exports.adminCreatePromotionSchema = Joi.object({
         .iso()
         .min('now')
         .required()
-        .message({
+        .messages({
             'date.base': 'Start date must be a valid date.',
             'date.min': 'Start date cannot be earlier than today.',
             'any.required': 'Start date is required.',
@@ -236,7 +234,7 @@ module.exports.adminCreatePromotionSchema = Joi.object({
         .iso()
         .min(Joi.ref('checkinDate'))
         .required()
-        .message({
+        .messages({
             'date.base': 'End date must be a valid date.',
             'date.min': 'End date cannot be earlier than today.',
             'any.required': 'End date is required.',
@@ -317,7 +315,7 @@ module.exports.adminUpdatePromotionSchema = Joi.object({
     isActive: Joi
         .boolean()
         .default(false)
-        .message({
+        .messages({
             'boolean.base': 'Is active must be a  boolean'
         }),
     startDate: Joi
@@ -325,7 +323,7 @@ module.exports.adminUpdatePromotionSchema = Joi.object({
         .iso()
         .min('now')
         .optional()
-        .message({
+        .messages({
             'date.base': 'Start date must be a valid date.',
             'date.min': 'Start date cannot be earlier than today.',
         }),
@@ -334,7 +332,7 @@ module.exports.adminUpdatePromotionSchema = Joi.object({
         .iso()
         .min(Joi.ref('checkinDate'))
         .optional()
-        .message({
+        .messages({
             'date.base': 'End date must be a valid date.',
             'date.min': 'End date cannot be earlier than today.',
         }),

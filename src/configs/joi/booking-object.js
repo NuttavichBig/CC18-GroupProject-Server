@@ -81,7 +81,7 @@ module.exports.createBookingSchema = Joi.object({
         .iso()
         .min('now')
         .required()
-        .message({
+        .messages({
             'date.base': 'Check-in date must be a valid date.',
             'date.min': 'Check-in date cannot be earlier than today.',
             'any.required': 'Check-in date is required.',
@@ -91,7 +91,7 @@ module.exports.createBookingSchema = Joi.object({
         .iso()
         .min(Joi.ref('checkinDate'))
         .required()
-        .message({
+        .messages({
             'date.base': 'Checkout date must be a valid date.',
             'date.min': 'Checkout date must be later than check-in date.',
             'any.required': 'Checkout date is required.',
