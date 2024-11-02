@@ -1,17 +1,11 @@
 const prisma  = require("../configs/prisma");
 const createError = require("../utility/createError");
-const Joi = require("joi");
-const { getHotelQuerySchema,createHotelSchema,updateHotelSchema } = require("../configs/joi/hotel-object")
 const cloudinary = require("../configs/cloudinary")
 const fs = require("fs")
 const path = require("path")
 
 exports.getHotels = async (req, res, next) => {
-    const {error, value} = getHotelQuerySchema.validate(req.query)
-    if(error){
-        return createError(400, error.details[0].message)
-    }
-    const {search,maxPrice,minPrice,star,orderBy,sortBy,facilities,limit,page,isActive} = value
+    const {search,maxPrice,minPrice,star,orderBy,sortBy,facilities,limit,page,isActive} = req.input
     const filterCondition = {
         ...(search && { name: { contains: search } }),
         ...(maxPrice && { price: { lte: maxPrice } }),  
@@ -56,11 +50,7 @@ exports.getHotelById = async (req, res,next) => {
     }
 }
 exports.createHotel = async (req, res,next) => {
-    const {error, value} = createHotelSchema.validate(req.body)
-    if(error){
-        return next(createError(400, error.details[0].message))
-    }
-    const {name, detail, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage,img } = value
+    const {name, detail, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage,img } = req.input
     const partner = await prisma.partner.findUnique({
         where: {
             userId : Number(req.user.id),
@@ -114,11 +104,7 @@ exports.createHotel = async (req, res,next) => {
 }
 exports.updateHotel = async (req, res,next) => {
     const {hotelId} = req.params
-    const {error, value} = updateHotelSchema.validate(req.body)
-    if(error){
-        return next(createError(400, error.details[0].message))
-    }
-    const { name, detail, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage } = value
+    const { name, detail, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage } = req.input
     let uploadedImg = null
     if (req.file) {
         const uploadedFile = await cloudinary.uploader.upload(req.file.path, {

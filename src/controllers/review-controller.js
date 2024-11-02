@@ -1,13 +1,16 @@
 const prisma = require("../configs/prisma")
 const createError = require("../utility/createError")
+const cloudinary = require("../configs/cloudinary")
+const fs = require("fs")
+const path = require("path")
 
 exports.getAllReviews = async (req, res, next) => {
-    const {page = 1, limit = 10} = req.query
+    const {page,limit} = req.input
     const skip = (page - 1) * limit
     try {
         const reviews = await prisma.review.findMany({
-            skip: Number(skip),
-            take: Number(limit),
+            skip,
+            take:limit,
             include: {
                 user: true,
                 hotel: true,
@@ -17,8 +20,8 @@ exports.getAllReviews = async (req, res, next) => {
         const totalReviews = await prisma.review.count()
         res.json({
             total: totalReviews,
-            page: Number(page),
-            limit: Number(limit),
+            page,
+            limit,
             data: reviews
         })
         
@@ -29,7 +32,24 @@ exports.getAllReviews = async (req, res, next) => {
 }
 
 exports.createReview = async (req, res, next) => {
-    const {content,bookingId,hotelId,rating,img} = req.body
+    const {content,bookingId,hotelId,rating} = req.input
+    const userId = Number(req.user.id)
+
+    if(!userId){
+        throw createError(404, "User not found")
+    }
+
+    let uploadedImg = null
+
+    if (req.file) {
+        const uploadedFile = await cloudinary.uploader.upload(req.file.path, {
+            overwrite: true,
+            public_id: path.parse(req.file.path).name
+        })
+        uploadedImg = uploadedFile.secure_url
+        fs.unlinkSync(req.file.path)
+    }
+
     try {
         const newReview = await prisma.review.create({
             data: {
@@ -37,8 +57,8 @@ exports.createReview = async (req, res, next) => {
                 bookingId,
                 hotelId,
                 rating,
-                img,
-                // userId: req.userId
+                img: uploadedImg,
+                userId
             }
         })
         res.json(newReview)
@@ -47,12 +67,9 @@ exports.createReview = async (req, res, next) => {
         next(error)
     }
 }
-
-
 exports.editReview = async (req, res, next) => {
     const {reviewId} = req.params
-    const {content,rating} = req.body
-
+    const {content,rating} = req.input
     try {
         const review = await prisma.review.findUnique({
             where: {
@@ -62,16 +79,13 @@ exports.editReview = async (req, res, next) => {
         if(!review){
             throw createError(404, "Review not found")
         }
-        // if(review.userId !== req.userId){
-        //     throw createError(403, "You are not allowed to edit this review")
-        // }
         const updatedReview = await prisma.review.update({
             where: {
                 id: Number(reviewId)
             },
             data: {
                 content,
-                rating
+                rating,
             }
         })
         res.json(updatedReview)
