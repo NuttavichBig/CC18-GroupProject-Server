@@ -10,6 +10,6 @@ const upload = require("../middlewares/upload")
 router.get('/',getReviewQueryValidator,reviewController.getAllReviews) // query
 router.post('/',authenticate,checkRole.userCheck,upload.single("img"),createReviewValidator,reviewController.createReview) // authen
 router.patch('/:reviewId',authenticate,checkRole.userCheck,updateReviewValidator,reviewController.editReview) // authen
-router.delete('/:reviewId',authenticate,checkRole.userCheck,reviewController.deleteReview) // authen
+router.delete('/:reviewId',authenticate,reviewController.deleteReview) // authen
 
 module.exports = router
