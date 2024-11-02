@@ -2,12 +2,12 @@ const Joi = require("joi")
 
 // partner
 module.exports.createPartnerSchema = Joi.object({
-    name: Joi
+    companyName: Joi
         .string()
         .required()
         .messages({
             'string.base': 'Name must be a string',
-            'any.required': 'Name is required'
+            'any.required': 'Company Name is required'
         }),
     address: Joi
         .string()
