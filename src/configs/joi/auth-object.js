@@ -69,7 +69,7 @@ module.exports.registerSchema = Joi.object({
         }),
     birthdate: Joi
         .date()
-        // .iso()
+        .iso()
         .min('1900-01-01')
         .max('now')
         .optional()
@@ -136,7 +136,7 @@ module.exports.updateUserSchema = Joi.object({
         }),
     birthdate: Joi
         .date()
-        // .iso()
+        .iso()
         .min('1900-01-01')
         .max('now')
         .optional()
@@ -145,7 +145,18 @@ module.exports.updateUserSchema = Joi.object({
             'date.max': 'Birth date must be a date in the past.'
         })
 })
-module.exports.forgetPasswordSchema = Joi.object({
+module.exports.forgotPasswordSchema = Joi.object({
+    email: Joi
+    .string()
+    .email({ tlds: false })
+    .required()
+    .messages({
+        "string.empty": "Email is required.",
+        "string.base": "Email must be a string.",
+        "string.email": "Email or Password incorrect."
+    }),
+})
+module.exports.resetPasswordSchema = Joi.object({
     password: Joi
         .string()
         .required()
