@@ -1,9 +1,34 @@
 const prisma  = require("../configs/prisma");
 const createError = require("../utility/createError");
+const Joi = require("joi");
+const { getHotelQuerySchema,createHotelSchema,updateHotelSchema } = require("../configs/joi/hotel-object")
+const cloudinary = require("../configs/cloudinary")
+const fs = require("fs")
+const path = require("path")
 
 exports.getHotels = async (req, res, next) => {
+    const {error, value} = getHotelQuerySchema.validate(req.query)
+    if(error){
+        return createError(400, error.details[0].message)
+    }
+    const {search,maxPrice,minPrice,star,orderBy,sortBy,facilities,limit,page,isActive} = value
+    const filterCondition = {
+        ...(search && { name: { contains: search } }),
+        ...(maxPrice && { price: { lte: maxPrice } }),  
+        ...(minPrice && { price: { gte: minPrice } }),
+        ...(star && { star: { equals: star } }),
+        ...(facilities && { facilitiesHotel: { some: { id: { in: facilities } } } }),
+        ...(isActive && { isActive: { equals: isActive } })
+    }
     try{
-        const hotels = await prisma.hotel.findMany()
+        const hotels = await prisma.hotel.findMany({
+            where: filterCondition,
+            orderBy: {
+                [sortBy]: orderBy
+            },
+            take: limit,
+            skip: (page - 1) * limit,
+        })
         res.json(hotels)
     } catch(error){
         next(error)
@@ -31,29 +56,53 @@ exports.getHotelById = async (req, res,next) => {
     }
 }
 exports.createHotel = async (req, res,next) => {
-    const { name, detail, img, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage, partnerId } = req.body
-    console.log(req.body)
+    const {error, value} = createHotelSchema.validate(req.body)
+    if(error){
+        return next(createError(400, error.details[0].message))
+    }
+    const {name, detail, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage,img } = value
+    const partner = await prisma.partner.findUnique({
+        where: {
+            userId : Number(req.user.id),
+        },
+    });
+
+    if (!partner) {
+        return next(createError(404, "Partner not found"))
+    }
+
+    let uploadedImg = null
+
+    if (req.file) {
+        const uploadedFile = await cloudinary.uploader.upload(req.file.path, {
+            overwrite: true,
+            public_id: path.parse(req.file.path).name
+        })
+        uploadedImg = uploadedFile.secure_url
+        fs.unlinkSync(req.file.path)
+    }
+
     try{
         
         const newHotel = await prisma.hotel.create({
             data:{
                 name,
                 detail,
-                img,
                 address,
                 lat,
                 lng,
                 star,
-                checkinTime: new Date(checkinTime),
-                checkoutTime: new Date(checkoutTime),
+                checkinTime,
+                checkoutTime,
                 phone,
                 webPage,
+                img: uploadedImg,
                 facilitiesHotel:{
                     create:facilitiesHotel
                 },
                 partner: {
                     connect: {
-                        id: Number(partnerId)
+                        id: Number(partner.id),
                     }
                 }
             },
@@ -65,24 +114,40 @@ exports.createHotel = async (req, res,next) => {
 }
 exports.updateHotel = async (req, res,next) => {
     const {hotelId} = req.params
-    const { name, detail, img, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage, partnerId } = req.body
+    const {error, value} = updateHotelSchema.validate(req.body)
+    if(error){
+        return next(createError(400, error.details[0].message))
+    }
+    const { name, detail, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage } = value
+    let uploadedImg = null
+    if (req.file) {
+        const uploadedFile = await cloudinary.uploader.upload(req.file.path, {
+            overwrite: true,
+            public_id: path.parse(req.file.path).name
+        })
+        uploadedImg = uploadedFile.secure_url
+        fs.unlinkSync(req.file.path)
+    }
     try{
         const updatedHotel = await prisma.hotel.update({
             where:{ id: Number(hotelId) },
             data:{
                 name,
                 detail,
-                img,
+                img: uploadedImg,
                 address,
                 lat,
                 lng,
                 star,
-                checkinTime: new Date(checkinTime),
-                checkoutTime: new Date(checkoutTime),
+                checkinTime,
+                checkoutTime,
                 phone,
                 webPage,
                 facilitiesHotel:{
-                    create:facilitiesHotel
+                    upsert:{
+                        create:facilitiesHotel,
+                        update:facilitiesHotel
+                    }
                 }
             },
         })
