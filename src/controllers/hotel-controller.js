@@ -51,7 +51,7 @@ exports.getHotelById = async (req, res,next) => {
 }
 exports.createHotel = async (req, res,next) => {
     const {name, detail, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage,img } = req.input
-    const partner = await prisma.partner.findUnique({
+    let partner = await prisma.partner.findUnique({
         where: {
             userId : Number(req.user.id),
         },

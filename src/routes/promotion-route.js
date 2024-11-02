@@ -1,12 +1,14 @@
 const express = require("express")
 const router = express.Router()
 const promotionController = require("../controllers/promotion-controller")
+const {getPromotionQueryValidator,userGetPromotionValidator} = require("../middlewares/validator")
+const authenticate = require("../middlewares/authenticate")
+const checkRole = require("../middlewares/checkRole")
 
 
-router.get('/',promotionController.getAllPromotions) // query
+router.get('/',getPromotionQueryValidator,promotionController.getAllPromotions) // query
 router.get('/:promotionId',promotionController.getPromotionById)
-router.post('/get',promotionController.userGetPromotions) // authen
-
+router.post('/get',authenticate,checkRole.userCheck,userGetPromotionValidator,promotionController.userGetPromotions) // authen
 
 
 

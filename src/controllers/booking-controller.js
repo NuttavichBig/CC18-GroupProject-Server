@@ -15,8 +15,10 @@ exports.getAllBookings = async (req, res, next) => {
         checkUser = {
           userId : userId
         }
+      } else if (UUID){
+        checkUser = {UUID: UUID}
       } else{
-        checkUser = {}
+        return res.json({total: 0, page, limit, data: []})
       }
 
       const bookings = await prisma.booking.findMany({

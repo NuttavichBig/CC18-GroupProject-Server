@@ -2,39 +2,45 @@ const prisma = require("../configs/prisma");
 const createError = require("../utility/createError");
 
 exports.getAllPromotions = async (req, res, next) => {
-    const {search,page = 1, limit = 10,orderBy="id",sortBy="asc"} = req.query
+    const {search,page, limit,orderBy,sortBy,isActive} = req.input
     const skip = (page - 1) * limit
 
     const allowedOrder = ["id","name","startDate","endDate","isActive","discountValue","discountPercent","minimumSpend","maxDiscount","usageLimit","createdAt","updatedAt"]
-    const orderField = allowedOrder.includes(orderBy) ? orderBy : "id"
+    const orderField = allowedOrder.includes(sortBy) ? sortBy : "id"
     const orderDirection = sortBy.toLowerCase()==="desc"?"desc":"asc"
     try {
         const promotions = await prisma.promotion.findMany({
-            where: search ? {
+            where: {
+                ...(search ? {
                 OR: [
                     { name: { contains: search } },
                     { code: { contains: search} }
                 ]
-            } : {},
+            } : {}),
+                ...(isActive !== undefined?{isActive: isActive === "true"}:{}),
+            },
             orderBy: {
                 [orderField]: orderDirection,
             },
-            skip: Number(skip),
-            take: Number(limit),
+            skip,
+            take: limit,
         })
         const totalPromotions = await prisma.promotion.count({
-            where: search ? {
-                OR: [
-                    { name: { contains: search } },
-                    { code: { contains: search} }
-                ]
-            } : {},
+            where:{
+                ...(search ? {
+                    OR: [
+                        { name: { contains: search } },
+                        { code: { contains: search} }
+                    ]
+                } : {}),
+                ...(isActive !== undefined?{isActive: isActive === "true"}:{}),
+            } 
 
         })
         res.json({
             total: totalPromotions,
-            page: Number(page),
-            limit: Number(limit),
+            page,
+            limit,
             data: promotions
         })
         
@@ -58,7 +64,7 @@ exports.getPromotionById = async (req, res, next) => {
     }
 }
 exports.userGetPromotions = async (req, res, next) => {
-    const {promotionId} = req.body
+    const {promotionId} = req.input
     try {
         const currentDate = new Date()
         const promotion = await prisma.promotion.findFirst({

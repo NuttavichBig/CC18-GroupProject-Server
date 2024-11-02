@@ -96,24 +96,40 @@ exports.editReview = async (req, res, next) => {
 }
 exports.deleteReview = async (req, res, next) => {
     const {reviewId} = req.params
+    const userId = req.user ? req.user.id : null
     try {
         const review = await prisma.review.findUnique({
             where: {
                 id: Number(reviewId)
+            },
+            include:{
+                user: true
             }
         })
         if(!review){
             throw createError(404, "Review not found")
         }
-        // if(review.userId !== req.userId){
-        //     throw createError(403, "You are not allowed to delete this review")
-        // }
-        const deletedReview = await prisma.review.delete({
-            where: {
-                id: Number(reviewId)
+        const userRole = req.user ? req.user.role : null
+        if (userRole === "ADMIN"){
+            const deletedReview = await prisma.review.delete({
+                where: {
+                    id: Number(reviewId)
+                }
+            })
+            res.json(deletedReview)
+        } else if (userRole === "USER"){
+            if (review.user.id !== userId){
+                return createError(403, "You can only delete your own reviews")
             }
-        })
-        res.json(deletedReview)
+            const deletedReview = await prisma.review.delete({
+                where: {
+                    id: Number(reviewId)
+                }
+            })
+            res.json(deletedReview)
+        } else {
+            return createError(401, "Unauthorized")
+        }
         
     } catch (error) {
         next(error)
