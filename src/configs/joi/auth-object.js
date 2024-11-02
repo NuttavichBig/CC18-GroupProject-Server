@@ -69,11 +69,11 @@ module.exports.registerSchema = Joi.object({
         }),
     birthdate: Joi
         .date()
-        .iso()
+        // .iso()
         .min('1900-01-01')
         .max('now')
         .optional()
-        .message({
+        .messages({
             'date.min': 'Birth date cannot be earlier than January 1, 1900.',
             'date.max': 'Birth date must be a date in the past.'
         })
@@ -136,11 +136,11 @@ module.exports.updateUserSchema = Joi.object({
         }),
     birthdate: Joi
         .date()
-        .iso()
+        // .iso()
         .min('1900-01-01')
         .max('now')
         .optional()
-        .message({
+        .messages({
             'date.min': 'Birth date cannot be earlier than January 1, 1900.',
             'date.max': 'Birth date must be a date in the past.'
         })
