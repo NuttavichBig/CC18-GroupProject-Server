@@ -1,5 +1,10 @@
 const prisma = require("../configs/prisma")
 const createError = require("../utility/createError")
+const {v4 : uuidv4} = require('uuid')
+
+function generateUUID(){
+  return uuidv4()
+}
 
 exports.getAllBookings = async (req, res, next) => {
   try {
