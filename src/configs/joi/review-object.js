@@ -39,17 +39,6 @@ module.exports.createReviewSchema = Joi.object({
             'number.base': "BookingId must be a number",
             'number.integer': "BookingId must be an integer",
             'any.required': 'BookingId amount is required'
-
-        }),
-    hotelId: Joi
-        .number()
-        .integer()
-        .required()
-        .messages({
-            'number.base': "hotelId must be a number",
-            'number.integer': "hotelId must be an integer",
-            'any.required': 'hotelId amount is required'
-
         }),
     rating: Joi
         .number()

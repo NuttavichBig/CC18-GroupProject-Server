@@ -7,9 +7,9 @@ const checkRole = require("../middlewares/checkRole")
 const upload = require("../middlewares/upload")
 
 
-router.get('/',getReviewQueryValidator,reviewController.getAllReviews) // query
-router.post('/',authenticate,checkRole.userCheck,upload.single("img"),createReviewValidator,reviewController.createReview) // authen
-router.patch('/:reviewId',authenticate,checkRole.userCheck,updateReviewValidator,reviewController.editReview) // authen
-router.delete('/:reviewId',authenticate,reviewController.deleteReview) // authen
+router.get('/',checkRole.adminCheck,getReviewQueryValidator,reviewController.getAllReviews) // query
+router.post('/',checkRole.userCheck,upload.single("img"),createReviewValidator,reviewController.createReview) // authen
+router.patch('/:reviewId',checkRole.userCheck,upload.single("img"),updateReviewValidator,reviewController.editReview) // authen
+router.delete('/:reviewId',reviewController.deleteReview) 
 
 module.exports = router
