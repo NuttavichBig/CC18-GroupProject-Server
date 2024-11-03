@@ -87,6 +87,7 @@ module.exports.getHotelQuerySchema = Joi.object({
             Joi.boolean(), // Allows boolean true or false directly
             Joi.string().valid('true', 'false').custom((value) => value === 'true') // Converts string to boolean
         )
+        .default(true)
         .messages({
             'any.only': 'IsActive must be "true" or "false".',
             'string.base': 'IsActive must be a string.',

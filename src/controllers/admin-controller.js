@@ -151,6 +151,28 @@ exports.updatePartnerStatus = async (req, res, next) => {
             return createError(400, "Partner not found")
         }
 
+        // check have create hotel?
+        if(status === "ACTIVE" && partner.status === "PENDING"){
+            const hotel = await prisma.hotel.findFirst({
+                where : {
+                    partnerId : partner.id
+                }
+            })
+            if(!hotel){
+                return createError(401,"This partner need to create hotel before got approve")
+            }
+            // create hotel
+            await prisma.hotel.update({
+                where : {
+                    id : hotel.id
+                },
+                data : {
+                    isActive : true
+                }
+            })
+        }
+
+        // update partner
         const updatePartner = await prisma.partner.update({
             where: {
                 id: partner.id
@@ -159,6 +181,7 @@ exports.updatePartnerStatus = async (req, res, next) => {
                 status
             }
         })
+       
         res.json({ message: 'Update success', partner: updatePartner })
 
     } catch (error) {

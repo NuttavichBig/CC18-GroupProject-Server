@@ -101,12 +101,18 @@ exports.createBooking = async (req, res, next) => {
     const newBooking = await prisma.booking.create({
       data: {
         UUID: generateUUID(),
-        userId: userId,
-        hotelId: hotelId,
+        userId,
+        hotelId,
         userHavePromotionId,
         totalPrice,
-        checkinDate: new Date(checkInDate),
-        checkoutDate: new Date(checkOutDate),
+        checkinDate: checkInDate,
+        checkoutDate: checkOutDate
+      },include :{
+        userHavePromotions : {
+          include : {
+            promotion : true
+          }
+        }
       }
     });
 
@@ -117,7 +123,7 @@ exports.createBooking = async (req, res, next) => {
       });
     }
 
-    res.json(newBooking)
+    res.json({message : "Booking success",booking : newBooking})
   } catch (error) {
     next(error)
   }
