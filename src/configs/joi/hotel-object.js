@@ -21,7 +21,7 @@ module.exports.getHotelQuerySchema = Joi.object({
     minPrice: Joi
         .number()
         .precision(2)
-        .optional()
+        .default(0)
         .messages({
             'number.base': 'Min price must be a number'
         }),
@@ -47,14 +47,15 @@ module.exports.getHotelQuerySchema = Joi.object({
         }),
     sortBy: Joi
         .string()
-        .valid('rating', 'price', 'id')
+        .valid('rating', 'price' , 'id')
         .default('id')
         .messages({
-            'any.only': 'Sort by must be one of "rating", "price", or "id"',
+            'any.only': 'Sort by must be one of "rating", "price" or "id"',
             'string.base': 'Sort by must be a string'
         }),
     facilities: Joi
-        .string()
+        .array()
+        .items(Joi.string())
         .optional()
         .messages({
             'array.base': 'Facilities must be an array',
