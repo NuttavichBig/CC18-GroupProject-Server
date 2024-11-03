@@ -42,7 +42,7 @@ model Partner {
   status      Status   @default(PENDING)
 
   user  User    @relation(fields: [userId], references: [id])
-  hotel Hotel[]
+  hotels Hotel[]
 }
 
 model Hotel {

@@ -137,13 +137,16 @@ exports.createHotel = async (req, res, next) => {
         }
 
         // check is already have hotel
-        const hotel = await prisma.hotel.findUnique({
+        const hotels = await prisma.hotel.findMany({
             where: {
                 partnerId: partner.id
             }
         })
-        if (hotel?.isActive === true) {
-            return createError(400, "You already have registered hotel")
+        if(hotels.length > 0){
+            const findActive = hotels.find(item => item.isActive === true)
+            if (findActive) {
+                return createError(400, "You already have registered hotel")
+            }
         }
 
         // image handle
