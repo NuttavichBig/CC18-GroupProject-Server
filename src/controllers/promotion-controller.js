@@ -4,10 +4,6 @@ const createError = require("../utility/createError");
 exports.getAllPromotions = async (req, res, next) => {
     const {search,page, limit,orderBy,sortBy,isActive} = req.input
     const skip = (page - 1) * limit
-
-    const allowedOrder = ["id","name","startDate","endDate","isActive","discountValue","discountPercent","minimumSpend","maxDiscount","usageLimit","createdAt","updatedAt"]
-    const orderField = allowedOrder.includes(sortBy) ? sortBy : "id"
-    const orderDirection = orderBy.toLowerCase()==="desc"?"desc":"asc"
     try {
         const promotions = await prisma.promotion.findMany({
             where: {
@@ -17,10 +13,10 @@ exports.getAllPromotions = async (req, res, next) => {
                     { code: { contains: search} }
                 ]
             } : {}),
-                ...(isActive !== undefined?{isActive: isActive === "true"}:{}),
+                ...(isActive === true || isActive === false?{isActive: isActive}:{}),
             },
             orderBy: {
-                [orderField]: orderDirection,
+                [sortBy]: orderBy,
             },
             skip,
             take: limit,
@@ -33,7 +29,7 @@ exports.getAllPromotions = async (req, res, next) => {
                         { code: { contains: search} }
                     ]
                 } : {}),
-                ...(isActive !== undefined?{isActive: isActive === "true"}:{}),
+                ...(isActive === true || isActive === false?{isActive: isActive}:{}),
             } 
 
         })
@@ -80,9 +76,15 @@ exports.userGetPromotions = async (req, res, next) => {
             },
         })
         if(!promotion){
-            throw createError(404, "Promotion not available")
+            throw createError(400, "Promotion not available")
         }
-        res.json(promotion)
+        const promotionGet = await prisma.userHavePromotion.create({
+            data : {
+                userId : req.user.id,
+                promotionId
+            }
+        })
+        res.json({message : "get promotion",data :promotionGet,promotion})
         
     } catch (error) {
         next(error)

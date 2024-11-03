@@ -207,7 +207,7 @@ exports.updateHotel = async (req, res, next) => {
             }
         })
         if (!hotel) {
-            return createError(400, "This hotel no longer exist")
+            return createError(404, "This hotel no longer exist")
         }
         // check owner
         if (req.user.id !== hotel.partner.userId) return createError(401, "You don't have permitted")
@@ -269,7 +269,7 @@ exports.deleteHotel = async (req, res, next) => {
             }
         })
         if (!hotel) {
-            return createError(400, "This hotel no longer exist")
+            return createError(404, "This hotel no longer exist")
         }
         // check owner
         if (req.user.id !== hotel.partner.userId) return createError(401, "You don't have permitted")
