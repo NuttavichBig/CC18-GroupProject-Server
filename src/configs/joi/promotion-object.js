@@ -40,17 +40,17 @@ module.exports.getPromotionQuerySchema = Joi.object({
         }),
     sortBy: Joi
         .string()
-        .valid('id', 'name', 'discountPercent', 'discountValue', 'minimumSpend', 'maxDiscount', 'createdAt', 'startDate', 'endDate')
+        .valid('id', 'name', 'discountPercent', 'discountValue', 'minimumSpend', 'maxDiscount', 'createdAt', 'startDate', 'endDate',"usageLimit","createdAt","updatedAt")
         .default('id')
         .messages({
-            'any.only': 'Sort by must be one of "id", "checkinDate", "checkoutDate","createdAt" or "status"',
+            'any.only': 'Sort by must be one of "id", "name", "discountPercent", "discountValue", "minimumSpend", "maxDiscount", "createdAt", "startDate", "endDate","usageLimit","createdAt" or "updatedAt"',
             'string.base': 'Sort by must be a string'
         }),
     isActive: Joi
         .alternatives()
         .try(
             Joi.boolean(), // Allows boolean true or false directly
-            Joi.string().valid('true', 'false').custom((value) => value === 'true') // Converts string to boolean
+            Joi.string().valid('true', 'false').custom((value) => value === 'true'?true:false) // Converts string to boolean
         )
         .optional()
         .messages({
