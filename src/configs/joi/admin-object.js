@@ -157,7 +157,7 @@ module.exports.adminCreatePromotionSchema = Joi.object({
         .integer()
         .min(0)
         .max(100)
-        .optional()
+        .default(0)
         .messages({
             'number.base': 'Discount percent must be a number',
             'number.integer': 'Discount percent must be an integer',
@@ -168,7 +168,7 @@ module.exports.adminCreatePromotionSchema = Joi.object({
         .number()
         .precision(2)
         .positive()
-        .optional()
+        .default(0)
         .messages({
             'number.base': 'Discount value must be a number',
             'number.positive': 'Discount value must be greater than zero',
@@ -177,7 +177,7 @@ module.exports.adminCreatePromotionSchema = Joi.object({
         .number()
         .precision(2)
         .positive()
-        .optional()
+        .default(0)
         .messages({
             'number.base': 'Minimum spend must be a number',
             'number.positive': 'Minimum spend must be greater than zero',
@@ -232,7 +232,7 @@ module.exports.adminCreatePromotionSchema = Joi.object({
     endDate: Joi
         .date()
         .iso()
-        .min(Joi.ref('checkinDate'))
+        .min(Joi.ref('startDate'))
         .required()
         .messages({
             'date.base': 'End date must be a valid date.',
@@ -330,7 +330,7 @@ module.exports.adminUpdatePromotionSchema = Joi.object({
     endDate: Joi
         .date()
         .iso()
-        .min(Joi.ref('checkinDate'))
+        .min(Joi.ref('startDate'))
         .optional()
         .messages({
             'date.base': 'End date must be a valid date.',

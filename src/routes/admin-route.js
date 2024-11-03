@@ -2,9 +2,10 @@ const express = require("express")
 const router = express.Router()
 const {adminGetUserQueryValidator,adminUpdateUserValidator,
     adminGetPartnerQueryValidator,adminUpdatePartnerValidator,
-    adminCreatePromotion,adminUpdatePromotion,
+    adminCreatePromotionValidator,adminUpdatePromotionValidator,
     adminUpdateBookingValidator} = require("../middlewares/validator")
 const adminController = require("../controllers/admin-controller")
+const upload = require("../middlewares/upload")
 
 // user
 router.get('/user',adminGetUserQueryValidator,adminController.getAllUsers) // query
@@ -16,8 +17,8 @@ router.get('/partner',adminGetPartnerQueryValidator,adminController.getAllPartne
 router.patch('/partner/:partnerId',adminUpdatePartnerValidator,adminController.updatePartnerStatus)
 
 // promotion
-router.post('/promotion',adminCreatePromotion,adminController.createPromotion)
-router.patch('/promotion/:promotionId',adminUpdatePromotion,adminController.updatePromotion)
+router.post('/promotion',upload.single('img'),adminCreatePromotionValidator,adminController.createPromotion)
+router.patch('/promotion/:promotionId',upload.single('img'),adminUpdatePromotionValidator,adminController.updatePromotion)
 router.delete('/promotion/:promotionId',adminController.deletePromotion)
 
 // booking
