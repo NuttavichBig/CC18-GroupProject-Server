@@ -41,8 +41,8 @@ model Partner {
   updatedAt   DateTime @updatedAt @map("updated_at")
   status      Status   @default(PENDING)
 
-  user  User   @relation(fields: [userId], references: [id])
-  hotel Hotel?
+  user  User    @relation(fields: [userId], references: [id])
+  hotel Hotel[]
 }
 
 model Hotel {
@@ -51,8 +51,8 @@ model Hotel {
   detail       String   @map("detail") @db.Text
   address      String
   img          String
-  checkinTime  String @map("checkin_time")
-  checkoutTime String @map("checkout_time")
+  checkinTime  String   @map("checkin_time")
+  checkoutTime String   @map("checkout_time")
   lat          Float
   lng          Float
   star         Int?
@@ -61,7 +61,7 @@ model Hotel {
   phone        String
   webPage      String?  @map("web_page")
   isActive     Boolean  @default(false) @map("is_active")
-  partnerId    Int      @unique @map("partner_id")
+  partnerId    Int      @map("partner_id")
 
   rooms             Room[]
   reviews           Review[]
