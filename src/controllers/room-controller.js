@@ -17,20 +17,23 @@ exports.createRoom = async (req, res, next) => {
       roomAmount,
     } = req.body;
 
-    const {id} = req.user
+    const { id } = req.user
     const partner = await prisma.partner.findFirst({
-      where:{userId:Number(id)},
-      select:{
-        hotel: {
-          select: {
-            id: true,
-          },
-        },
-      }
+      where: { userId: Number(id) }
     })
 
-    if(!partner || !partner.hotel){
-      return createError(400,"Hotel not found please create hotel")
+    if (!partner) {
+      return createError(400, "ํYou are not a partner")
+    }
+
+    const hotel = await prisma.hotel.findFirst({
+      where: {
+        partnerId: partner.id,
+        isActive: true
+      }
+    })
+    if (!hotel) {
+      return createError(400, "Please create hotel")
     }
 
     const files = req.files;
@@ -59,9 +62,7 @@ exports.createRoom = async (req, res, next) => {
         type,
         price: Number(price),
         recommendPeople: Number(recommendPeople),
-        hotel: {
-          connect: { id: Number(partner.hotel.id) },
-        },
+        hotelId: hotel.id,
         size: Number(size),
         roomAmount: Number(roomAmount),
         facilitiesRoom: {
@@ -98,6 +99,16 @@ exports.updateRoom = async (req, res, next) => {
       roomAmount,
     } = req.body;
 
+    // check exist
+    const room = await prisma.room.findFirst({
+      where: {
+        id: Number(roomId),
+      },
+    })
+    if (!room) {
+      return createError(404, "This room does not Exist!!");
+    }
+
     const updateRoom = await prisma.room.update({
       where: {
         id: Number(roomId),
@@ -107,11 +118,11 @@ exports.updateRoom = async (req, res, next) => {
         detail,
         type,
         price: Number(price),
-        size:Number(size),
+        size: Number(size),
         recommendPeople: Number(recommendPeople),
         roomAmount: Number(roomAmount),
         facilitiesRoom: {
-            update: facilityRoom,
+          update: facilityRoom,
         },
       },
     });

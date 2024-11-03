@@ -145,7 +145,7 @@ exports.forgetPassword = async (req, res, next) => {
       from: 'cc18hotelbook@gmail.com',
       to: email,
       subject: 'Hotel book account reset password',
-      text: `this is reset password link for your account http://localhost:5703/reset-password/${token}`
+      text: `this is reset password link for your account http://localhost:5173/reset-password/${token}`
     };
     transporter.sendMail(mailOptions, async(error, info) => {
       if (error) {

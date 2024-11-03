@@ -1,120 +1,135 @@
 const prisma = require("../configs/prisma")
 const createError = require("../utility/createError")
+const {v4 : uuidv4} = require('uuid')
+
+function generateUUID(){
+  return uuidv4()
+}
 
 exports.getAllBookings = async (req, res, next) => {
+  try {
     const { search, page, limit, orderBy, sortBy } = req.input
     const skip = (page - 1) * limit;
-    const userId = req.user? req.user.id : null
-    const userRole = req.user ? req.user.role : null
 
-    try {
-      let checkUser = {}
-      if(userRole === 'ADMIN') {
-        checkUser = {}
-      } else if (userId) {
-        checkUser = {
-          userId : userId
-        }
-      } else{
-        return res.json({total: 0, page, limit, data: []})
-      }
 
-      const bookings = await prisma.booking.findMany({
-        where: {
-          ...checkUser,
-          ...(search && { OR: [
-            { hotels: { name: { contains: search } } }, 
-            { UUID: { contains: search } } 
-          ] })
-        },
-        skip,
-        take:limit,
-        orderBy: { [sortBy]: orderBy },
-        include: {
-          hotels: true,
-          users: true,
-        }
-      });
-
-      const totalBookings = await prisma.booking.count({
-        where: checkUser
-      });
-      
-      res.json({
-        total: totalBookings,
-        page,
-        limit,
-        data: bookings,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-  exports.getBookingByUUID = async (req, res, next) => {
-    const { UUID } = req.params;
-  
-    try {
-      const booking = await prisma.booking.findUnique({
-        where: { UUID },
-        include: {
-          hotels: true,
-          users: true,
-        }
-      });
-  
-      if (!booking) {
-        throw createError(404, "Booking not found")
-      }
-  
-      res.json(booking)
-    } catch (error) {
-      next(error);
-    }
-  };
-  exports.createBooking = async (req, res, next) => {
-    const { userId, promotionId, totalPrice, checkInDate, checkOutDate, hotelId } = req.input
-  
-    try {
-
-      let userHavePromotionId = null;
-      if (promotionId) {
-        const userPromotion = await prisma.userHavePromotion.findFirst({
-          where: {
-            userId: userId,
-            promotionId: promotionId,
-            isUsed: false
+    // initial condition
+    const condition = {
+      skip,
+      take: limit,
+      orderBy: { [sortBy]: orderBy },
+      include: {
+        hotels: {
+          select: {
+            name: true,
+            partnerId: true
           }
-        });
-  
-        if (!userPromotion) {
-          throw createError(400, "Invalid or already used promotion")
+        },
+        users: {
+          select: {
+            email: true,
+          }
         }
-  
-        userHavePromotionId = userPromotion.id;
       }
-  
-      const newBooking = await prisma.booking.create({
-        data: {
-          UUID: generateUUID(), 
+    }
+
+    // check search
+    if(search){
+      condition.where = {OR: [
+        { hotels: { name: { contains: search } } },
+        { UUID: { contains: search } }
+      ]}
+    }
+    // check role
+    if(req.user.role === 'USER'){
+      condition.where = {...condition.where,userId : req.user.id}
+    }else if(req.user.role === 'PARTNER'){
+      condition.where = {...condition.where,hotels : {partner : {userId : req.user.id}}}
+    }
+
+    const bookings = await prisma.booking.findMany(condition);
+    const {skip:s , take , orderBy:o ,include , ...checkingTotal} = condition
+  const totalBookings = await prisma.booking.count(checkingTotal);
+
+  res.json({
+    total: totalBookings,
+    page,
+    limit,
+    data: bookings,
+  });
+} catch (error) {
+  next(error);
+}
+}
+exports.getBookingByUUID = async (req, res, next) => {
+  const { UUID } = req.params;
+
+  try {
+    const booking = await prisma.booking.findUnique({
+      where: { UUID },
+      include: {
+        hotels: true,
+        users: true,
+      }
+    });
+
+    if (!booking) {
+      throw createError(404, "Booking not found")
+    }
+
+    res.json(booking)
+  } catch (error) {
+    next(error);
+  }
+};
+exports.createBooking = async (req, res, next) => {
+  const { userId, promotionId, totalPrice, checkInDate, checkOutDate, hotelId } = req.input
+
+  try {
+
+    let userHavePromotionId = null;
+    if (promotionId) {
+      const userPromotion = await prisma.userHavePromotion.findFirst({
+        where: {
           userId: userId,
-          hotelId: hotelId,
-          userHavePromotionId,
-          totalPrice,
-          checkinDate: new Date(checkInDate),
-          checkoutDate: new Date(checkOutDate),
+          promotionId: promotionId,
+          isUsed: false
         }
       });
-  
-      if (userHavePromotionId) {
-        await prisma.userHavePromotion.update({
-          where: { id: userHavePromotionId },
-          data: { isUsed: true }
-        });
+
+      if (!userPromotion) {
+        throw createError(400, "Invalid or already used promotion")
       }
-  
-      res.json(newBooking)
-    } catch (error) {
-      next(error)
+
+      userHavePromotionId = userPromotion.id;
     }
-  };
-  
+
+    const newBooking = await prisma.booking.create({
+      data: {
+        UUID: generateUUID(),
+        userId,
+        hotelId,
+        userHavePromotionId,
+        totalPrice,
+        checkinDate: checkInDate,
+        checkoutDate: checkOutDate
+      },include :{
+        userHavePromotions : {
+          include : {
+            promotion : true
+          }
+        }
+      }
+    });
+
+    if (userHavePromotionId) {
+      await prisma.userHavePromotion.update({
+        where: { id: userHavePromotionId },
+        data: { isUsed: true }
+      });
+    }
+
+    res.json({message : "Booking success",booking : newBooking})
+  } catch (error) {
+    next(error)
+  }
+};
