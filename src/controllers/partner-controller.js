@@ -67,17 +67,19 @@ exports.createPartner = async (req, res, next) => {
 exports.updatePartner = async (req, res, next) => {
   try {
     const { id } = req.user;
-    const { address, bankName, bankAccount } = req.body;
-
+    const partner = await prisma.partner.findUnique({
+      where : {
+        userId : id
+      }
+    })
+    if(!partner){
+      return createError(401,"You are not partner")
+    }
     const editPartner = await prisma.partner.update({
       where: {
-        userId: Number(id),
+        id : partner.id
       },
-      data: {
-        address,
-        bankName,
-        bankAccount,
-      },
+      data:req.input
     });
 
     const { userId, createdAt, updatedAt, status, ...partnerData } =
@@ -97,7 +99,7 @@ exports.deletePartner = async (req, res, next) => {
       return createError(401, "Unauthorized");
     }
 
-    await prisma.partner.update({
+    const partner = await prisma.partner.update({
       where: {
         userId: Number(id),
       },
@@ -105,6 +107,14 @@ exports.deletePartner = async (req, res, next) => {
         status: "INACTIVE",
       },
     });
+
+    await prisma.hotel.updateMany({
+      where : {
+        partnerId : partner.id
+      },data :{
+        isActive : false
+      }
+    })
     res.json("Inactive Success");
   } catch (error) {
     next(error);
