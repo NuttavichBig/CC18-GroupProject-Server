@@ -5,6 +5,7 @@ const checkUser = require("../services/check-user")
 const nodemailer = require("nodemailer")
 
 const prisma = require("../configs/prisma");
+const oAuth2Client = require("../configs/oAuth2Client")
 
 exports.register = async (req, res, next) => {
   try {
@@ -214,3 +215,56 @@ exports.resetPassword = async (req, res, next) => {
     next(err)
   }
 }
+
+exports.googleLogin = async (req, res, next) => {
+  try {
+    const { credential } = req.body;
+
+    if(!credential){
+      return createError(400,"Please try to login")
+    }
+
+    const ticket = await oAuth2Client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.CLIENT_ID,
+    });
+
+    const payloadFromGoogle = ticket.getPayload();
+    const googleId = payloadFromGoogle["sub"];
+    const email = payloadFromGoogle["email"];
+    const firstName = payloadFromGoogle["given_name"];
+    const lastName = payloadFromGoogle["family_name"];
+
+    let user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          firstName,
+          lastName,
+          email,
+          googleId,
+        },
+      });
+    } else {
+      user = await prisma.user.update({
+        where: { email },
+        data: { googleId },
+      });
+    }
+
+    const payload = {
+      id: user.id,
+    };
+
+    const token = jwt.sign(payload, process.env.SECRET_KEY, {
+      expiresIn: "1d",
+    });
+
+    res.json({ token });
+  } catch (error) {
+    next(error);
+  }
+};
