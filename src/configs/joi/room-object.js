@@ -84,3 +84,86 @@ module.exports.createRoomSchema = Joi.object({
             'any.required': 'Facilities are required'
         })
 });
+module.exports.updateRoomSchema = Joi.object({
+    name: Joi
+        .string()
+        .optional()
+        .messages({
+            'string.base': 'Name must be a string',
+        }),
+    detail: Joi
+        .string()
+        .optional()
+        .messages({
+            'string.base': 'Detail must be a string'
+        }),
+    type: Joi
+        .string()
+        .valid('SUITE', 'DOUBLE', 'MASTER')
+        .optional()
+        .messages({
+            'any.only': 'Order by must be either "asc" or "desc"',
+            'string.base': 'Order by must be a string'
+        }),
+    price: Joi
+        .number()
+        .precision(2)
+        .positive()
+        .optional()
+        .messages({
+            'number.base': 'Price must be a number',
+            'number.positive': 'Price must be greater than zero',
+        }),
+    recommendPeople: Joi
+        .number()
+        .integer()
+        .positive()
+        .optional()
+        .messages({
+            'number.base': 'Recommended people must be a number',
+            'number.integer': 'Recommended people must be an integer',
+            'number.positive': 'Recommended people must be greater than zero',
+        }),
+    size: Joi
+        .number()
+        .positive()
+        .optional()
+        .messages({
+            'number.base': 'Size must be a number',
+            'number.positive': 'Size must be greater than zero'
+        }),
+    roomAmount: Joi
+        .number()
+        .integer()
+        .positive()
+        .optional()
+        .messages({
+            'number.base': 'Room amount must be a number',
+            'number.integer': 'Room amount must be an integer',
+            'number.positive': 'Room amount must be greater than zero',
+        }),
+    facilityRoom: Joi
+        .object()
+        .pattern(
+            Joi.string(), // Keys must be strings
+            Joi.alternatives()
+                .try(
+                    Joi.boolean(), // Allow boolean values
+                    Joi.string().valid('true', 'false').custom((value) => {
+                        // Convert string "true" to true and "false" to false
+                        return value === 'true' ? true : false;
+                    })
+                )
+        )
+        .optional()
+        .messages({
+            'object.base': 'Facilities must be an object with boolean values',
+        }),
+        deleteImage: Joi
+        .array()
+        .items(Joi.string())
+        .optional()
+        .messages({
+            'array.base' : 'Delete image must be an array with string items'
+        })
+});

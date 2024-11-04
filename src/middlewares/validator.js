@@ -48,7 +48,7 @@ module.exports.updateHotelValidator = validateSchema(hotelObject.updateHotelSche
 
 // room
 module.exports.createRoomValidator = validateSchema(roomObject.createRoomSchema)
-module.exports.updateRoomValidator = validateSchema(roomObject.createRoomSchema)
+module.exports.updateRoomValidator = validateSchema(roomObject.updateRoomSchema)
 
 // review
 module.exports.getReviewQueryValidator = validateQuery(reviewObject.getReviewQuerySchema)
