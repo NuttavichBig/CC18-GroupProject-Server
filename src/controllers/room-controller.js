@@ -1,8 +1,9 @@
 const createError = require("../utility/createError");
 const path = require("path");
 const prisma = require("../configs/prisma");
-const fs = require("fs");
+const fs = require("fs/promises");
 const cloudinary = require("../configs/cloudinary");
+const getPublicId = require("../utility/getPublicId")
 
 exports.createRoom = async (req, res, next) => {
   try {
@@ -15,7 +16,7 @@ exports.createRoom = async (req, res, next) => {
       facilityRoom,
       size,
       roomAmount,
-    } = req.body;
+    } = req.input;
 
     const { id } = req.user
     const partner = await prisma.partner.findFirst({
@@ -46,15 +47,10 @@ exports.createRoom = async (req, res, next) => {
           public_id: path.parse(file.path).name,
         });
         uploadResults.push(uploadResult.secure_url); // Collect the secure URLs
-        fs.unlinkSync(file.path); // Remove the file after upload
+        fs.unlink(file.path); // Remove the file after upload
       }
     }
-
-    for (const key in facilityRoom) {
-      if (facilityRoom[key] === "true") facilityRoom[key] = true;
-      if (facilityRoom[key] === "false") facilityRoom[key] = false;
-    }
-
+    console.log(facilityRoom)
     const newRoom = await prisma.room.create({
       data: {
         name,
@@ -62,7 +58,9 @@ exports.createRoom = async (req, res, next) => {
         type,
         price: Number(price),
         recommendPeople: Number(recommendPeople),
-        hotelId: hotel.id,
+        hotel :{
+          connect: {id : hotel.id}
+        },
         size: Number(size),
         roomAmount: Number(roomAmount),
         facilitiesRoom: {
@@ -70,6 +68,7 @@ exports.createRoom = async (req, res, next) => {
         },
       },
     });
+
 
     const RoomImg = uploadResults.map((el) => ({
       img: el,
@@ -97,17 +96,48 @@ exports.updateRoom = async (req, res, next) => {
       recommendPeople,
       facilityRoom,
       roomAmount,
-    } = req.body;
+      deleteImage,
+    } = req.input;
 
     // check exist
     const room = await prisma.room.findFirst({
       where: {
         id: Number(roomId),
-      },
+      },include:{
+        hotel :{
+          select : {
+            partnerId : true
+          }
+        }
+      }
     })
     if (!room) {
       return createError(404, "This room does not Exist!!");
     }
+
+    const partner = await prisma.partner.findUnique({
+      where : {
+        userId : req.user.id
+      }
+    })
+
+    if(room.hotel.partnerId !== partner.id){
+      return createError(401,"You don't have permitted")
+    }
+    //image handle
+    const files = req.files;
+    const uploadResults = [];
+    if (files && files.length > 0) {
+      for (const file of files) {
+        const uploadResult = await cloudinary.uploader.upload(file.path, {
+          overwrite: true,
+          public_id: path.parse(file.path).name,
+        });
+        uploadResults.push(uploadResult.secure_url); // Collect the secure URLs
+        fs.unlink(file.path); // Remove the file after upload
+      }
+    }
+
 
     const updateRoom = await prisma.room.update({
       where: {
@@ -126,6 +156,31 @@ exports.updateRoom = async (req, res, next) => {
         },
       },
     });
+    const RoomImg = uploadResults.map((el) => ({
+      img: el,
+      roomId :+roomId, // Associate each image with the created room
+    }));
+    await prisma.roomImg.createMany({
+      data: RoomImg,
+    });
+
+
+    //DELETE IMAGE    
+    if (deleteImage && deleteImage.length > 0) {
+      for(const img of deleteImage) {
+      cloudinary.uploader.destroy(getPublicId(img))
+      const imageId = await prisma.roomImg.findFirst({
+        where : {
+          img : img
+        }
+      })
+      await prisma.roomImg.delete({
+        where : {
+              id : imageId.id
+      }})
+      }
+  }
+
     res.json(updateRoom);
   } catch (error) {
     next(error);

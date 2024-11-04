@@ -145,26 +145,49 @@ exports.forgetPassword = async (req, res, next) => {
       from: 'cc18hotelbook@gmail.com',
       to: email,
       subject: 'Hotel book account reset password',
-      text: `this is reset password link for your account http://localhost:5173/reset-password/${token}`
+      text: "Hello Click Link to resetPassword", // plain text body
+      html: `
+    <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+      <h2 style="text-align: center; color: #4a90e2;">🔒 Reset Your Password</h2>
+      <p style="text-align: center; color: #555; font-size: 16px;">
+        We received a request to reset your password. Please click the button below to set a new password:
+      </p>
+      <div style="text-align: center; margin: 20px 0;">
+        <a href="http://localhost:5173/reset-password/${token}" style="
+          display: inline-block; 
+          padding: 15px 30px; 
+          font-size: 16px; 
+          color: #fff; 
+          background: linear-gradient(90deg, #ff6f61, #de6b83); 
+          border-radius: 5px; 
+          text-decoration: none; 
+          transition: background 0.3s;">
+          Reset Password
+        </a>
+      </div>
+      <p style="text-align: center; color: #555; font-size: 14px;">
+        If you did not request a password reset, please ignore this email.
+      </p>
+    </div>`
     };
-    transporter.sendMail(mailOptions, async(error, info) => {
+    transporter.sendMail(mailOptions, async (error, info) => {
       if (error) {
         console.log(error);
       } else {
         console.log('Email sent: ' + info.response);
         await prisma.user.update({
-          where : {
-            id : user.id
+          where: {
+            id: user.id
           },
-          data : {
-            resetPasswordToken : token
+          data: {
+            resetPasswordToken: token
           }
         })
       }
     });
 
 
-    res.json({message : 'Please check your email',token})
+    res.json({ message: 'Please check your email', token })
 
   } catch (err) {
     next(err);
@@ -173,43 +196,43 @@ exports.forgetPassword = async (req, res, next) => {
 
 exports.resetPassword = async (req, res, next) => {
   try {
-    const {password} = req.input
+    const { password } = req.input
     // check is request?
-    if(!req.user.resetPasswordToken){
-      return createError(400,"You haven't request for reset password")
+    if (!req.user.resetPasswordToken) {
+      return createError(400, "You haven't request for reset password")
     }
     // get token
     const authorization = req.headers.authorization;
     const token = authorization.split(" ")[1];
-    if(token !== req.user.resetPasswordToken){
-      return createError(400,"Your token is not for reset password")
+    if (token !== req.user.resetPasswordToken) {
+      return createError(400, "Your token is not for reset password")
     }
 
     // check password 
     const user = await prisma.user.findUnique({
-      where : {
-        id : req.user.id
-      },select:{
-        password : true
+      where: {
+        id: req.user.id
+      }, select: {
+        password: true
       }
     })
-    const isPasswordMatch = await bcrypt.compare(password,user.password);
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (isPasswordMatch) {
       return createError(400, "You can't use old password");
     }
 
     // hash then change
-    const hashPassword = await bcrypt.hash(password,10);
+    const hashPassword = await bcrypt.hash(password, 10);
     await prisma.user.update({
-      where : {
-        id : req.user.id
+      where: {
+        id: req.user.id
       },
-      data : {
-        password : hashPassword,
-        resetPasswordToken : null
+      data: {
+        password: hashPassword,
+        resetPasswordToken: null
       }
     })
-    res.json({message : "Successfully reset password"})
+    res.json({ message: "Successfully reset password" })
   } catch (err) {
     next(err)
   }
