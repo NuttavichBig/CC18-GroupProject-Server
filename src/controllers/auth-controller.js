@@ -272,10 +272,12 @@ exports.googleLogin = async (req, res, next) => {
         },
       });
     } else {
-      user = await prisma.user.update({
-        where: { email },
-        data: { googleId },
-      });
+        if(!user.googleId){
+          user = await prisma.user.update({
+            where: { email },
+            data: { googleId },
+          });
+      }
     }
 
     const payload = {
