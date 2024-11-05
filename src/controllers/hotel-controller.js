@@ -24,27 +24,6 @@ exports.getHotels = async (req, res, next) => {
             where: {},
         }
 
-        // let nearbyHotels = []
-
-        // if(lat&&lng){
-        //     const currentLocation={latitude:parseFloat(lat),longitude:parseFloat(lng)}
-        // //filter location with maxDiatance 
-        // const allLocations = await prisma.hotel.findMany()
-        // nearbyHotels = allLocations.filter(hotel =>{
-        //     if(hotel.lat && hotel.lng){
-        //         const point = { latitude: parseFloat(hotel.lat), longitude: parseFloat(hotel.lng) };
-        //         const distance = haversine(currentLocation,point)
-        //         return distance < maxDistance
-        //     }
-        //     return false
-        // })
-        //check nearby hotels
-        // if(nearbyHotels.length>0){
-        //     condition.where.id = {in:nearbyHotels.map(hotel=>hotel.id)}
-        // }else{
-        //     return res.json({hotels:[]})
-        // }      
-        // }
 
         // check nest sorted
         if (sortBy !== 'price' && sortBy !== 'rating') {
