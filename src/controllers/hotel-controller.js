@@ -8,7 +8,7 @@ const haversine = require("../utility/haversine");
 
 exports.getHotels = async (req, res, next) => {
     try {
-        const { search, maxPrice, minPrice, star, orderBy, sortBy, facilities, limit, page, isActive,lat, lng,, checkinDate, checkoutDate  } = req.input
+        const { search, maxPrice, minPrice, star, orderBy, sortBy, facilities, limit, page, isActive, lat, lng, checkinDate, checkoutDate } = req.input
         const maxDistance = 8000
 
         // make initial condition
@@ -19,7 +19,7 @@ exports.getHotels = async (req, res, next) => {
             include: {
                 rooms: true,
                 reviews: true,
-                facilitiesHotel : true
+                facilitiesHotel: true
             },
             where: {},
         }
@@ -38,7 +38,7 @@ exports.getHotels = async (req, res, next) => {
         //     }
         //     return false
         // })
-        // //check nearby hotels
+        //check nearby hotels
         // if(nearbyHotels.length>0){
         //     condition.where.id = {in:nearbyHotels.map(hotel=>hotel.id)}
         // }else{
@@ -60,7 +60,6 @@ exports.getHotels = async (req, res, next) => {
                 ...(star && { star: { equals: star } }),
                 ...(facilities && { facilitiesHotel: { AND: facilities.map((item) => ({ [item]: true })) } }),
                 ...(isActive && { isActive: { equals: isActive } }),
-                ...(nearbyHotels.length>0 && {id:{in:nearbyHotels.map(hotel=>hotel.id)}})
             }
             if (maxPrice) {
                 condition.where.rooms = {
@@ -84,8 +83,27 @@ exports.getHotels = async (req, res, next) => {
         const getHotels = await prisma.hotel.findMany(condition)
         let finalHotels = []
         if (getHotels.length > 0) {
+            // around location filter
+            let nearbyHotels = [...getHotels]
+            if (lat && lng) {
+                const currentLocation = { latitude: parseFloat(lat), longitude: parseFloat(lng) }
+                //filter location with maxDistance 
+                nearbyHotels = getHotels.filter(hotel => {
+                    if (hotel.lat && hotel.lng) {
+                        const point = { latitude: parseFloat(hotel.lat), longitude: parseFloat(hotel.lng) };
+                        const distance = haversine(currentLocation, point)
+                        return distance < maxDistance
+                    }
+                    return false
+                })
+                console.log(nearbyHotels)
+                if(nearbyHotels.length === 0){
+                    return res.json({hotels : nearbyHotels})
+                }
+            }
+
             // avg review rating
-            let hotels = getHotels.map(hotel => {
+            let hotels = nearbyHotels.map(hotel => {
                 if (hotel.reviews.length > 0) {
                     const totalRate = hotel.reviews.reduce((acc, prv) => acc + prv.rating, 0)
                     hotel.rating = totalRate / hotel.reviews.length
@@ -118,14 +136,14 @@ exports.getHotels = async (req, res, next) => {
                         for (const date of dateList) {
                             const bookNo = await prisma.booking.count({
                                 where: {
-                                    checkinDate: {lte: date},
-                                    checkoutDate: {gt: date},
-                                    bookingRooms : {
-                                        some : {
-                                            roomId : room.id
+                                    checkinDate: { lte: date },
+                                    checkoutDate: { gt: date },
+                                    bookingRooms: {
+                                        some: {
+                                            roomId: room.id
                                         }
                                     }
-                                    }
+                                }
                             })
                             if (room.roomAmount - bookNo < 0) {
                                 isAvailable = false
