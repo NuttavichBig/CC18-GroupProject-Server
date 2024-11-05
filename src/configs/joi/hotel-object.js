@@ -47,7 +47,7 @@ module.exports.getHotelQuerySchema = Joi.object({
         }),
     sortBy: Joi
         .string()
-        .valid('rating', 'price' , 'id')
+        .valid('rating', 'price', 'id')
         .default('id')
         .messages({
             'any.only': 'Sort by must be one of "rating", "price" or "id"',
@@ -91,6 +91,44 @@ module.exports.getHotelQuerySchema = Joi.object({
         .messages({
             'any.only': 'IsActive must be "true" or "false".',
             'string.base': 'IsActive must be a string.',
+        }),
+    lat: Joi
+        .number()
+        .min(-90)
+        .max(90)
+        .optional()
+        .messages({
+            'number.base': 'Latitude must be a number',
+            'number.min': 'Latitude must be between -90 and 90',
+            'number.max': 'Latitude must be between -90 and 90',
+        }),
+    lng: Joi
+        .number()
+        .min(-180)
+        .max(180)
+        .optional()
+        .messages({
+            'number.base': 'Longitude must be a number',
+            'number.min': 'Longitude must be between -180 and 180',
+            'number.max': 'Longitude must be between -180 and 180',
+        }),
+    checkinDate: Joi
+        .date()
+        .iso()
+        .min('now')
+        .optional()
+        .messages({
+            'date.base': 'Check-in date must be a valid date.',
+            'date.min': 'Check-in date cannot be earlier than today.',
+        }),
+    checkoutDate: Joi
+        .date()
+        .iso()
+        .min(Joi.ref('checkinDate'))
+        .optional()
+        .messages({
+            'date.base': 'Checkout date must be a valid date.',
+            'date.min': 'Checkout date must be later than check-in date.',
         })
 })
 // .and('maxPrice', 'minPrice'); // Sure that ,maxPrice amd minPrice are provided together
@@ -117,7 +155,6 @@ module.exports.createHotelSchema = Joi.object({
             'string.base': 'Address must be a string',
             'any.required': 'Address is required'
         }),
-
     lat: Joi
         .number()
         .min(-90)
@@ -129,7 +166,6 @@ module.exports.createHotelSchema = Joi.object({
             'number.max': 'Latitude must be between -90 and 90',
             'any.required': 'Latitude is required'
         }),
-
     lng: Joi
         .number()
         .min(-180)
@@ -193,7 +229,7 @@ module.exports.createHotelSchema = Joi.object({
             'object.base': 'Facilities must be an object with boolean values',
             'any.required': 'Facilities are required'
         }),
-        phone: Joi
+    phone: Joi
         .string()
         .pattern(/^\d{10}$/)
         .required()
@@ -201,7 +237,7 @@ module.exports.createHotelSchema = Joi.object({
             'string.pattern.base': 'Phone number must be exactly 10 digits.',
             'any.required': 'Phone number are required'
         }),
-        webPage : Joi
+    webPage: Joi
         .string()
         .optional()
         .messages({
@@ -307,20 +343,20 @@ module.exports.updateHotelSchema = Joi.object({
             'object.base': 'Facilities must be an object with boolean values',
             'any.required': 'Facilities are required'
         }),
-        phone: Joi
+    phone: Joi
         .string()
         .pattern(/^\d{10}$/)
         .required()
         .messages({
             'string.pattern.base': 'Phone number must be exactly 10 digits.'
         }),
-        webPage : Joi
+    webPage: Joi
         .string()
         .optional()
         .messages({
             'string.pattern.base': 'Web page must be exactly 10 digits.'
         }),
-        img: Joi
+    img: Joi
         .string()
         .optional()
         .messages({
