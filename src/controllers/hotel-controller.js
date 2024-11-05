@@ -3,11 +3,13 @@ const createError = require("../utility/createError");
 const cloudinary = require("../configs/cloudinary")
 const getPublicId = require("../utility/getPublicId")
 const fs = require("fs/promises")
-const path = require("path")
+const path = require("path");
+const haversine = require("../utility/haversine");
 
 exports.getHotels = async (req, res, next) => {
     try {
-        const { search, maxPrice, minPrice, star, orderBy, sortBy, facilities, limit, page, isActive } = req.input
+        const { search, maxPrice, minPrice, star, orderBy, sortBy, facilities, limit, page, isActive,lat, lng, } = req.input
+        const maxDistance = 8000
 
         // make initial condition
         const condition = {
@@ -17,7 +19,30 @@ exports.getHotels = async (req, res, next) => {
             include: {
                 rooms: true,
                 reviews: true
+            },
+            where: {},
+        }
+
+        let nearbyHotels = []
+
+        if(lat&&lng){
+            const currentLocation={latitude:parseFloat(lat),longitude:parseFloat(lng)}
+        //filter location with maxDiatance 
+        const allLocations = await prisma.hotel.findMany()
+        nearbyHotels = allLocations.filter(hotel =>{
+            if(hotel.lat && hotel.lng){
+                const point = { latitude: parseFloat(hotel.lat), longitude: parseFloat(hotel.lng) };
+                const distance = haversine(currentLocation,point)
+                return distance < maxDistance
             }
+            return false
+        })
+        //check nearby hotels
+        if(nearbyHotels.length>0){
+            condition.where.id = {in:nearbyHotels.map(hotel=>hotel.id)}
+        }else{
+            return res.json({hotels:[]})
+        }
         }
 
         // check nest sorted
@@ -33,7 +58,8 @@ exports.getHotels = async (req, res, next) => {
                 ...(search && { name: { contains: search } }),
                 ...(star && { star: { equals: star } }),
                 ...(facilities && { facilitiesHotel: { AND: facilities.map((item) => ({ [item]: true })) } }),
-                ...(isActive && { isActive: { equals: isActive } })
+                ...(isActive && { isActive: { equals: isActive } }),
+                ...(nearbyHotels.length>0 && {id:{in:nearbyHotels.map(hotel=>hotel.id)}})
             }
             if (maxPrice) {
                 condition.where.rooms = {
