@@ -91,7 +91,19 @@ module.exports.getHotelQuerySchema = Joi.object({
         .messages({
             'any.only': 'IsActive must be "true" or "false".',
             'string.base': 'IsActive must be a string.',
-        })
+        }),
+        lat: Joi
+        .number()
+        .optional()
+        .messages({
+            'number.base': 'Latitude must be a number'
+        }),
+        lng: Joi
+        .number()
+        .optional()
+        .messages({
+            'number.base': 'Longitude must be a number'
+        }),
 })
 // .and('maxPrice', 'minPrice'); // Sure that ,maxPrice amd minPrice are provided together
 
