@@ -8,7 +8,7 @@ const haversine = require("../utility/haversine");
 
 exports.getHotels = async (req, res, next) => {
     try {
-        const { search, maxPrice, minPrice, star, orderBy, sortBy, facilities, limit, page, isActive,lat, lng, } = req.input
+        const { search, maxPrice, minPrice, star, orderBy, sortBy, facilities, limit, page, isActive, lat, lng, checkinDate, checkoutDate } = req.input
         const maxDistance = 8000
 
         // make initial condition
@@ -18,32 +18,12 @@ exports.getHotels = async (req, res, next) => {
             skip: (page - 1) * limit,
             include: {
                 rooms: true,
-                reviews: true
+                reviews: true,
+                facilitiesHotel: true
             },
             where: {},
         }
 
-        let nearbyHotels = []
-
-        if(lat&&lng){
-            const currentLocation={latitude:parseFloat(lat),longitude:parseFloat(lng)}
-        //filter location with maxDiatance 
-        const allLocations = await prisma.hotel.findMany()
-        nearbyHotels = allLocations.filter(hotel =>{
-            if(hotel.lat && hotel.lng){
-                const point = { latitude: parseFloat(hotel.lat), longitude: parseFloat(hotel.lng) };
-                const distance = haversine(currentLocation,point)
-                return distance < maxDistance
-            }
-            return false
-        })
-        //check nearby hotels
-        if(nearbyHotels.length>0){
-            condition.where.id = {in:nearbyHotels.map(hotel=>hotel.id)}
-        }else{
-            return res.json({hotels:[]})
-        }
-        }
 
         // check nest sorted
         if (sortBy !== 'price' && sortBy !== 'rating') {
@@ -59,7 +39,6 @@ exports.getHotels = async (req, res, next) => {
                 ...(star && { star: { equals: star } }),
                 ...(facilities && { facilitiesHotel: { AND: facilities.map((item) => ({ [item]: true })) } }),
                 ...(isActive && { isActive: { equals: isActive } }),
-                ...(nearbyHotels.length>0 && {id:{in:nearbyHotels.map(hotel=>hotel.id)}})
             }
             if (maxPrice) {
                 condition.where.rooms = {
@@ -78,11 +57,32 @@ exports.getHotels = async (req, res, next) => {
                 };
             }
         }
+
+
         const getHotels = await prisma.hotel.findMany(condition)
         let finalHotels = []
         if (getHotels.length > 0) {
+            // around location filter
+            let nearbyHotels = [...getHotels]
+            if (lat && lng) {
+                const currentLocation = { latitude: parseFloat(lat), longitude: parseFloat(lng) }
+                //filter location with maxDistance 
+                nearbyHotels = getHotels.filter(hotel => {
+                    if (hotel.lat && hotel.lng) {
+                        const point = { latitude: parseFloat(hotel.lat), longitude: parseFloat(hotel.lng) };
+                        const distance = haversine(currentLocation, point)
+                        return distance < maxDistance
+                    }
+                    return false
+                })
+                console.log(nearbyHotels)
+                if(nearbyHotels.length === 0){
+                    return res.json({hotels : nearbyHotels})
+                }
+            }
+
             // avg review rating
-            const hotels = getHotels.map(hotel => {
+            let hotels = nearbyHotels.map(hotel => {
                 if (hotel.reviews.length > 0) {
                     const totalRate = hotel.reviews.reduce((acc, prv) => acc + prv.rating, 0)
                     hotel.rating = totalRate / hotel.reviews.length
@@ -91,6 +91,56 @@ exports.getHotels = async (req, res, next) => {
                 }
                 return hotel
             })
+
+
+            //filter for date
+            if (checkinDate) {
+                let dateList = []
+                let startDate = new Date(checkinDate)
+                do {
+                    dateList.push(new Date(startDate))
+                    startDate.setDate(startDate.getDate() + 1)
+                } while (checkoutDate && startDate < checkoutDate)
+                for (let hotel of hotels) {
+                    let availableRoom = hotel.rooms.length
+                    for (const room of hotel.rooms) {
+                        if (room.price < minPrice) {
+                            availableRoom--
+                            break;
+                        } else if (maxPrice && room.price > maxPrice) {
+                            availableRoom--
+                            break;
+                        }
+                        let isAvailable = true
+                        for (const date of dateList) {
+                            const bookNo = await prisma.booking.count({
+                                where: {
+                                    checkinDate: { lte: date },
+                                    checkoutDate: { gt: date },
+                                    bookingRooms: {
+                                        some: {
+                                            roomId: room.id
+                                        }
+                                    }
+                                }
+                            })
+                            if (room.roomAmount - bookNo < 0) {
+                                isAvailable = false
+                                break;
+                            }
+                        }
+                        if (isAvailable === false) {
+                            availableRoom--
+                            break;
+                        }
+                    }
+                    if (availableRoom <= 0) {
+                        hotel = null
+                    }
+                }
+                hotels = hotels.filter(item => item !== null)
+            }
+
 
             // sort nest
             let sortedHotels = [...hotels]
@@ -109,7 +159,7 @@ exports.getHotels = async (req, res, next) => {
                     });
                 }
             }
-            if (sortBy === 'rating') {
+            else if (sortBy === 'rating') {
                 sortedHotels = hotels.sort((a, b) => {
                     return orderBy === 'asc' ? a.rating - b.rating : b.rating - a.rating
                 })
@@ -121,6 +171,7 @@ exports.getHotels = async (req, res, next) => {
                 return data
             })
         }
+
         res.json({ hotels: finalHotels })
     } catch (error) {
         next(error)
@@ -168,7 +219,7 @@ exports.createHotel = async (req, res, next) => {
                 partnerId: partner.id
             }
         })
-        if(hotels.length > 0){
+        if (hotels.length > 0) {
             const findActive = hotels.find(item => item.isActive === true)
             if (findActive) {
                 return createError(400, "You already have registered hotel")
