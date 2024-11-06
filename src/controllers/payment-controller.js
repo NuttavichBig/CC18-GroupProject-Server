@@ -39,6 +39,8 @@
 //         console.error("Error retrieving payment method details:", error);
 //         throw error;
 //     }
+// }
+
 
 const prisma = require("../configs/prisma");
 const createError = require("../utility/createError");
@@ -46,10 +48,11 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 exports.payment = async (req, res, next) => {
     try {
-        const { totalPrice } = req.body;
+        // const { totalPrice } = req.body;
 
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: Number(totalPrice) * 100,
+            // amount: Number(totalPrice) * 100,
+            amount: 1000,
             currency: "thb",
             payment_method_types: ["card", "promptpay"],
         });
