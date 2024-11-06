@@ -187,7 +187,8 @@ exports.getHotelById = async (req, res, next) => {
                 rooms: true,
                 rooms: {
                     include: {
-                        facilitiesRoom: true
+                        facilitiesRoom: true,
+                        images : true
                     }
                 },
                 reviews: true

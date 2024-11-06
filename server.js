@@ -18,7 +18,8 @@ const partnerRoute = require("./src/routes/partner-route");
 const authRoutes = require("./src/routes/auth-route");
 const adminRoute = require("./src/routes/admin-route");
 const locationRoute = require("./src/routes/location-route");
-const paymentRoute = require("./src/routes/payment-route")
+const paymentRoute = require("./src/routes/payment-route");
+const chatController = require("./src/controllers/chat-controller");
 
 // config
 require("dotenv").config();
@@ -48,11 +49,15 @@ app.use("/payment", paymentRoute)
 app.use("*", handleNotFound);
 app.use(handleError);
 
-// Socket Middleware
 
 // Socket Function
 io.on("connection", (socket) => {
   console.log(`User : ${socket.id} has connected`);
+  socket.removeAllListeners('joinChat')
+  socket.removeAllListeners('adminJoin')
+  socket.on('joinChat',()=>chatController.userChat(io,socket))
+  socket.on('adminJoin',()=>chatController.adminChat(io,socket))
+
 
   // disconnect listener
   socket.on("disconnect", () => {
