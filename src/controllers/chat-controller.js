@@ -1,6 +1,7 @@
 const prisma = require("../configs/prisma")
 const jwt = require('jsonwebtoken')
 const createError = require("../utility/createError")
+const { date } = require("joi")
 
 
 
@@ -53,7 +54,7 @@ module.exports.userChat = async (io, socket) => {
                 }
             })
             io.to('admin').emit('userMessage', { data: addMessage })
-            io.to(chatRoom.id).emit('message', msg)
+            io.to(chatRoom.id).emit('message',{data : addMessage})
         })
 
         // disconnect listener
@@ -118,7 +119,7 @@ module.exports.adminChat = async (io, socket) => {
                     }
                 })
                 io.to('admin').emit('userMessage', { data: addMessage })
-                io.to(chatRoom.id).emit('message', msg)
+                io.to(chatRoom.id).emit('message', {data : addMessage})
             })
             socket.on('leaveRoom', () => {
                 socket.leave(room.id)
