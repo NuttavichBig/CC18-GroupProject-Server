@@ -17,7 +17,9 @@ const promotionRoute = require("./src/routes/promotion-route");
 const partnerRoute = require("./src/routes/partner-route");
 const authRoutes = require("./src/routes/auth-route");
 const adminRoute = require("./src/routes/admin-route");
+const locationRoute = require("./src/routes/location-route");
 const paymentRoute = require("./src/routes/payment-route")
+
 // config
 require("dotenv").config();
 const app = express();
@@ -39,6 +41,7 @@ app.use("/booking", bookingRoute);
 app.use("/promotion", promotionRoute);
 app.use("/partner", authenticate, partnerRoute); // authen
 app.use("/admin", authenticate, checkRole.adminCheck, adminRoute); // authen
+// app.use("/location", locationRoute);
 app.use("/payment", paymentRoute)
 
 // exit middlewares

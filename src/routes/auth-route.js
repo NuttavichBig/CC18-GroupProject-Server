@@ -10,6 +10,6 @@ router.get("/user",authenticate ,authController.currentUser);
 router.patch("/user",authenticate,updateUserValidator,authController.updateUser);
 router.patch('/forgot-password',forgotPasswordValidator,authController.forgetPassword)
 router.patch("/reset-password",authenticate,resetPasswordValidator,authController.resetPassword);
-router.post("/google", (req,res) => res.json("Hello google login"));
+router.post("/google", authController.googleLogin);
 
 module.exports = router;
