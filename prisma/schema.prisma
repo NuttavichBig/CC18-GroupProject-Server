@@ -267,6 +267,7 @@ enum GENDER {
 
 model Chatbox {
   id       Int       @id @default(autoincrement())
+  socketId String    @unique
   userId   Int?      @unique
   user     User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages Message[]
@@ -275,6 +276,7 @@ model Chatbox {
 model Message {
   id        Int      @id @default(autoincrement())
   message   String
+  isAdmin   Boolean  @default(false)
   createdAt DateTime @default(now())
   chatboxId Int      @map("chatbox_id")
   chatbox   Chatbox  @relation(fields: [chatboxId], references: [id], onDelete: Cascade)
