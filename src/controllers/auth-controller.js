@@ -72,7 +72,7 @@ exports.login = async (req, res, next) => {
     const token = jwt.sign(payload, process.env.SECRET_KEY, {
       expiresIn: "1d",
     });
-    const { password: ps, role, createdAt, updatedAt, resetPasswordToken, status, ...respData } = user
+     
     res.json({ token, user: respData });
   } catch (err) {
     next(err);
@@ -353,7 +353,8 @@ exports.googleLogin = async (req, res, next) => {
           const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: "1d" });
 
           // ส่ง JWT token กลับไปยังไคลเอนต์
-          res.json({ token });
+          const { password: ps, role, createdAt, updatedAt, resetPasswordToken, status, ...respData } = user
+          res.json({ token ,user : respData});
         } catch (error) {
           console.error("Error parsing Google user info:", error);
           res.status(500).json({ message: "Failed to parse Google user info" });

@@ -170,6 +170,14 @@ exports.updatePartnerStatus = async (req, res, next) => {
                     isActive : true
                 }
             })
+            await prisma.user.update({
+                where : {
+                    id :partner.userId
+                },
+                data : {
+                    role : "PARTNER"
+                }
+            })
         }
 
         // update partner
