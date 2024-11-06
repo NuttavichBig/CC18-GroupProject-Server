@@ -55,8 +55,8 @@ io.on("connection", (socket) => {
   console.log(`User : ${socket.id} has connected`);
   socket.removeAllListeners('joinChat')
   socket.removeAllListeners('adminJoin')
-  socket.on('joinChat',()=>chatController.userChat(io,socket))
-  socket.on('adminJoin',()=>chatController.adminChat(io,socket))
+  socket.on('joinChat', () => chatController.userChat(io, socket))
+  socket.on('adminJoin', () => chatController.adminChat(io, socket))
 
 
   // disconnect listener
