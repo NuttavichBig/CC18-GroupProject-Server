@@ -109,7 +109,12 @@ exports.getAllPartners = async (req, res, next) => {
         const condition = {
             take: limit,
             skip: (page - 1) * limit,
-            orderBy: { [sortBy]: orderBy }
+            orderBy: { [sortBy]: orderBy },
+            include: {
+                hotel: true
+            }
+            
+            
         }
 
         // check search
