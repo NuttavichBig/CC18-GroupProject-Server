@@ -37,7 +37,7 @@ exports.getAllPromotions = async (req, res, next) => {
             total: totalPromotions,
             page,
             limit,
-            data: promotions
+            promotion: promotions
         })
         
     } catch (error) {
@@ -84,7 +84,7 @@ exports.userGetPromotions = async (req, res, next) => {
                 promotionId
             }
         })
-        res.json({message : "get promotion",data :promotionGet,promotion})
+        res.json({message : "get promotion",promotion :promotionGet,promotion})
         
     } catch (error) {
         next(error)
