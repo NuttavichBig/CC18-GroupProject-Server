@@ -27,6 +27,7 @@ model User {
   reviews    Review[]
   bookings   Booking[]
   promotions UserHavePromotion[]
+  Chatbox    Chatbox?
 }
 
 model Partner {
@@ -173,7 +174,7 @@ model Booking {
   checkoutDate        DateTime      @map("checkout_date")
   createdAt           DateTime      @default(now()) @map("created_at")
   updatedAt           DateTime      @updatedAt @map("updated_at")
-  userId              Int?           @map("user_id")
+  userId              Int?          @map("user_id")
   hotelId             Int           @map("hotel_id")
   userHavePromotionId Int?          @map("user_have_promotion_id")
 
@@ -214,7 +215,7 @@ model Review {
 model Payment {
   id            Int           @id @default(autoincrement())
   paymentMethod PaymentMethod @map("payment_method")
-  stripeId      String?       @map("stripe_id")       
+  stripeId      String?       @map("stripe_id")
   bookingId     Int           @unique @map("booking_id")
   createdAt     DateTime      @default(now()) @map("created_at")
 
@@ -262,4 +263,19 @@ enum GENDER {
   MALE
   FEMALE
   OTHER
+}
+
+model Chatbox {
+  id       Int       @id @default(autoincrement())
+  userId   Int?      @unique
+  user     User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  message   String
+  createdAt DateTime @default(now())
+  chatboxId Int      @map("chatbox_id")
+  chatbox   Chatbox  @relation(fields: [chatboxId], references: [id], onDelete: Cascade)
 }
