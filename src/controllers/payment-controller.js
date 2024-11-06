@@ -11,10 +11,13 @@ exports.payment = async (req, res) => {
         });
 
         getPaymentMethodDetails("pi_3QHoZJBU681vIFBk2EUdL7M3")  //ไปเอาidจากหน้าบ้าน เปลี่ยนตามไอดีเพื่อหาpayment method หลังบ้านตรงtype
+        console.log(paymentIntent)
+        console.log("------------------------------------")
 
         res.send({
             clientSecret: paymentIntent.client_secret,
         });
+
     } catch (error) {
         console.error("Error creating payment intent:", error);
         res.status(500).send({ error: "An error occurred while creating the payment intent." });
