@@ -1,5 +1,6 @@
 const Joi = require("joi")
-
+const startOfToday = new Date();
+startOfToday.setHours(0,0,0,0)
 // Hotel path
 module.exports.getHotelQuerySchema = Joi.object({
     search: Joi
@@ -107,7 +108,7 @@ module.exports.getHotelQuerySchema = Joi.object({
     checkinDate: Joi
         .date()
         .iso()
-        .min('now')
+        .min(startOfToday)
         .optional()
         .messages({
             'date.base': 'Check-in date must be a valid date.',
