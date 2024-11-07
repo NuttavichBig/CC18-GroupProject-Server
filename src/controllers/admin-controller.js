@@ -110,11 +110,7 @@ exports.getAllPartners = async (req, res, next) => {
             take: limit,
             skip: (page - 1) * limit,
             orderBy: { [sortBy]: orderBy },
-            include: {
-                hotel: true
-            }
-            
-            
+            include: { hotels: true }
         }
 
         // check search
