@@ -43,7 +43,7 @@ app.use("/promotion", promotionRoute);
 app.use("/partner", authenticate, partnerRoute); // authen
 app.use("/admin", authenticate, checkRole.adminCheck, adminRoute); // authen
 // app.use("/location", locationRoute);
-app.use("/payment",paymentRoute)
+app.use("/payment", paymentRoute)
 
 // exit middlewares
 app.use("*", handleNotFound);
@@ -55,8 +55,8 @@ io.on("connection", (socket) => {
   console.log(`User : ${socket.id} has connected`);
   socket.removeAllListeners('joinChat')
   socket.removeAllListeners('adminJoin')
-  socket.on('joinChat',()=>chatController.userChat(io,socket))
-  socket.on('adminJoin',()=>chatController.adminChat(io,socket))
+  socket.on('joinChat', () => chatController.userChat(io, socket))
+  socket.on('adminJoin', () => chatController.adminChat(io, socket))
 
 
   // disconnect listener

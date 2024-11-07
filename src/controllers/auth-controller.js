@@ -73,8 +73,8 @@ exports.login = async (req, res, next) => {
     const token = jwt.sign(payload, process.env.SECRET_KEY, {
       expiresIn: "1d",
     });
-    const {password:ps , role , createdAt , updatedAt , resetPasswordToken ,status , ...respData} = user
-    res.json({ token,user : respData });
+    const { password: ps, role, createdAt, updatedAt, resetPasswordToken, status, ...respData } = user
+    res.json({ token, user: respData });
   } catch (err) {
     next(err);
   }
@@ -240,57 +240,135 @@ exports.resetPassword = async (req, res, next) => {
   }
 }
 
+// exports.googleLogin = async (req, res, next) => {
+//   try {
+//     const { credential } = req.body;
+
+//     if (!credential) {
+//       return createError(400, "Please try to login")
+//     }
+
+//     const ticket = await oAuth2Client.verifyIdToken({
+//       idToken: credential,
+//       audience: process.env.CLIENT_ID,
+//     });
+
+//     const payloadFromGoogle = ticket.getPayload();
+//     const googleId = payloadFromGoogle["sub"];
+//     const email = payloadFromGoogle["email"];
+//     const firstName = payloadFromGoogle["given_name"];
+//     const lastName = payloadFromGoogle["family_name"];
+
+//     let user = await prisma.user.findUnique({
+//       where: { email },
+//     });
+
+//     if (!user) {
+//       user = await prisma.user.create({
+//         data: {
+//           firstName,
+//           lastName,
+//           email,
+//           googleId,
+//         },
+//       });
+//     } else {
+//       if (!user.googleId) {
+//         user = await prisma.user.update({
+//           where: { email },
+//           data: { googleId },
+//         });
+//       }
+//     }
+
+//     const payload = {
+//       id: user.id,
+//     };
+
+//     const token = jwt.sign(payload, process.env.SECRET_KEY, {
+//       expiresIn: "1d",
+//     });
+
+//     res.json({ token });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+
+
+const https = require('https');
+
+// Google Login API สำหรับใช้ Access Token
 exports.googleLogin = async (req, res, next) => {
   try {
-    const { credential } = req.body;
+    const { accessToken } = req.body;
 
-    if(!credential){
-      return createError(400,"Please try to login")
+    if (!accessToken) {
+      return res.status(400).json({ message: "Invalid access token, please try again" });
     }
 
-    const ticket = await oAuth2Client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.CLIENT_ID,
-    });
+    // ดึงข้อมูลผู้ใช้จาก Google API โดยใช้ https
+    const googleApiUrl = `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${accessToken}`;
 
-    const payloadFromGoogle = ticket.getPayload();
-    const googleId = payloadFromGoogle["sub"];
-    const email = payloadFromGoogle["email"];
-    const firstName = payloadFromGoogle["given_name"];
-    const lastName = payloadFromGoogle["family_name"];
+    https.get(googleApiUrl, (response) => {
+      let data = '';
 
-    let user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          firstName,
-          lastName,
-          email,
-          googleId,
-        },
+      // รวบรวมข้อมูลที่ได้รับทีละส่วน
+      response.on('data', (chunk) => {
+        data += chunk;
       });
-    } else {
-        if(!user.googleId){
-          user = await prisma.user.update({
+
+      // การตอบกลับเสร็จสิ้น
+      response.on('end', async () => {
+        try {
+          const googleUserInfo = JSON.parse(data);
+
+          const { id: googleId, email, given_name: firstName, family_name: lastName } = googleUserInfo;
+
+          // ค้นหาผู้ใช้ในฐานข้อมูลโดยใช้อีเมลที่ดึงมา
+          let user = await prisma.user.findUnique({
             where: { email },
-            data: { googleId },
           });
-      }
-    }
 
-    const payload = {
-      id: user.id,
-    };
+          // ถ้าไม่มีผู้ใช้นี้ ให้สร้างผู้ใช้ใหม่
+          if (!user) {
+            user = await prisma.user.create({
+              data: {
+                firstName,
+                lastName,
+                email,
+                googleId,
+              },
+            });
+          } else if (!user.googleId) {
+            // ถ้ามีผู้ใช้แต่ยังไม่มี googleId ให้เพิ่ม googleId ให้กับผู้ใช้เดิม
+            user = await prisma.user.update({
+              where: { email },
+              data: { googleId },
+            });
+          }
 
-    const token = jwt.sign(payload, process.env.SECRET_KEY, {
-      expiresIn: "1d",
+          // สร้าง JWT token เพื่อให้ผู้ใช้ล็อกอินเข้าสู่ระบบ
+          const payload = { id: user.id };
+          const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: "1d" });
+
+          // ส่ง JWT token กลับไปยังไคลเอนต์
+          const { password: ps, role, createdAt, updatedAt, resetPasswordToken, status, ...respData } = user
+          res.json({ token ,user : respData});
+        } catch (error) {
+          console.error("Error parsing Google user info:", error);
+          res.status(500).json({ message: "Failed to parse Google user info" });
+        }
+      });
+    }).on('error', (error) => {
+      console.error("Error during Google API request:", error);
+      res.status(500).json({ message: "Internal Server Error", error: error.message });
     });
 
-    res.json({ token });
   } catch (error) {
-    next(error);
+    console.error("Server error during Google login:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
+
