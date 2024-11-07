@@ -7,9 +7,7 @@ const getPublicId = require("../utility/getPublicId")
 const cloudinary = require("../configs/cloudinary")
 const fs = require("fs/promises")
 const path = require("path")
-
 const prisma = require("../configs/prisma");
-const oAuth2Client = require("../configs/oAuth2Client")
 
 exports.register = async (req, res, next) => {
   try {
