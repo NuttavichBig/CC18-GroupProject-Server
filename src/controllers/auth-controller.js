@@ -3,6 +3,10 @@ const jwt = require("jsonwebtoken");
 const createError = require("../utility/createError");
 const checkUser = require("../services/check-user")
 const nodemailer = require("nodemailer")
+const getPublicId = require("../utility/getPublicId")
+const cloudinary = require("../configs/cloudinary")
+const fs = require("fs/promises")
+const path = require("path")
 
 const prisma = require("../configs/prisma");
 const oAuth2Client = require("../configs/oAuth2Client")
@@ -93,7 +97,18 @@ exports.updateUser = async (req, res, next) => {
   try {
     const data = req.input
     const id = req.user.id
-
+    
+    if(req.file){
+      const uploadedFile = await cloudinary.uploader.upload(req.file.path, {
+        overwrite: true,
+        public_id: path.parse(req.file.path).name
+      })
+      data.image = uploadedFile.secure_url
+      fs.unlink(req.file.path)
+      if (req.user.image){
+        cloudinary.uploader.destroy(getPublicId(hotel.img))
+      }
+    }
     const updateData = await prisma.user.update({
       where: {
         id
@@ -101,8 +116,8 @@ exports.updateUser = async (req, res, next) => {
       data
     })
 
-    const { password: ps, createdAt, updatedAt, resetPasswordToken, status, ...user } = updateData
-    res.json({ message: "update success", user: user })
+    const { password: ps, createdAt, updatedAt, resetPasswordToken, status, ...userData } = updateData
+    res.json({ message: "update success", user: userData })
   } catch (err) {
     next(err);
   }
