@@ -10,7 +10,6 @@ exports.getHotels = async (req, res, next) => {
     try {
         const { search, maxPrice, minPrice, star, orderBy, sortBy, facilities, limit, page, isActive, lat, lng, checkinDate, checkoutDate } = req.input
         const maxDistance = 8000
-
         // make initial condition
         const condition = {
             orderBy: {},
