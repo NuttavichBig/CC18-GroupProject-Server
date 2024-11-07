@@ -17,7 +17,7 @@ const promotionRoute = require("./src/routes/promotion-route");
 const partnerRoute = require("./src/routes/partner-route");
 const authRoutes = require("./src/routes/auth-route");
 const adminRoute = require("./src/routes/admin-route");
-const locationRoute = require("./src/routes/location-route");
+// const locationRoute = require("./src/routes/location-route");
 const paymentRoute = require("./src/routes/payment-route");
 const chatController = require("./src/controllers/chat-controller");
 

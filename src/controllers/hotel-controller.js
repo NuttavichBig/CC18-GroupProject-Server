@@ -8,7 +8,7 @@ const haversine = require("../utility/haversine");
 
 exports.getHotels = async (req, res, next) => {
     try {
-        const { search, maxPrice, minPrice, star, orderBy, sortBy, facilities, limit, page, isActive, lat, lng, checkinDate, checkoutDate } = req.input
+        const { search, maxPrice, minPrice, star, orderBy, sortBy, facilities, limit, page, isActive, lat, lng, checkinDate, checkoutDate, guest, roomAmount, roomType } = req.input
         const maxDistance = 8000
         // make initial condition
         const condition = {
@@ -110,6 +110,18 @@ exports.getHotels = async (req, res, next) => {
                             availableRoom--
                             break;
                         }
+                        if(guest){
+                            if(guest > room.recommendPeople){
+                                availableRoom--
+                                break;
+                            }
+                        }
+                        if(roomType){
+                            if(roomType !== room.type){
+                                availableRoom--
+                                break;
+                            }
+                        }
                         let isAvailable = true
                         for (const date of dateList) {
                             const bookNo = await prisma.booking.count({
@@ -123,7 +135,7 @@ exports.getHotels = async (req, res, next) => {
                                     }
                                 }
                             })
-                            if (room.roomAmount - bookNo < 0) {
+                            if (room.roomAmount - bookNo < roomAmount) {
                                 isAvailable = false
                                 break;
                             }
