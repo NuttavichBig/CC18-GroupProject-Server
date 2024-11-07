@@ -9,6 +9,7 @@ const oAuth2Client = require("../configs/oAuth2Client")
 
 exports.register = async (req, res, next) => {
   try {
+    console.log('register path')
     const {
       email,
       password,
@@ -18,7 +19,7 @@ exports.register = async (req, res, next) => {
       gender,
       birthdate,
     } = req.input;
-
+    
     const isUserExist = await checkUser.byEmail(email)
 
     if (isUserExist) {
