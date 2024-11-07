@@ -21,7 +21,7 @@ exports.register = async (req, res, next) => {
       gender,
       birthdate,
     } = req.input;
-    
+
     const isUserExist = await checkUser.byEmail(email)
 
     if (isUserExist) {
@@ -91,35 +91,50 @@ exports.currentUser = async (req, res, next) => {
   }
 };
 
+
+
 exports.updateUser = async (req, res, next) => {
   try {
-    const data = req.input
-    const id = req.user.id
-    
-    if(req.file){
+    const data = req.input;
+    const id = req.user.id;
+
+
+    if (req.file) {
+
       const uploadedFile = await cloudinary.uploader.upload(req.file.path, {
         overwrite: true,
-        public_id: path.parse(req.file.path).name
-      })
-      data.image = uploadedFile.secure_url
-      fs.unlink(req.file.path)
-      if (req.user.image){
-        cloudinary.uploader.destroy(getPublicId(hotel.img))
+        public_id: path.parse(req.file.path).name,
+      });
+      data.image = uploadedFile.secure_url;
+
+
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error("Error deleting file:", err);
+      });
+
+
+      if (req.user.image) {
+        cloudinary.uploader.destroy(getPublicId(req.user.image))
       }
     }
-    const updateData = await prisma.user.update({
-      where: {
-        id
-      },
-      data
-    })
 
-    const { password: ps, createdAt, updatedAt, resetPasswordToken, status, ...userData } = updateData
-    res.json({ message: "update success", user: userData })
+    const updateData = await prisma.user.update({
+      where: { id },
+      data
+    });
+
+
+    const { password, createdAt, updatedAt, resetPasswordToken, status, ...userData } = updateData;
+    res.json({ message: 'update success', user: userData });
   } catch (err) {
+    console.error("Error in updateUser:", err);
     next(err);
   }
-}
+};
+
+
+
+
 
 // INCOMPLETE WAIT FOR O2AUTH
 exports.forgetPassword = async (req, res, next) => {
@@ -253,61 +268,6 @@ exports.resetPassword = async (req, res, next) => {
   }
 }
 
-// exports.googleLogin = async (req, res, next) => {
-//   try {
-//     const { credential } = req.body;
-
-//     if (!credential) {
-//       return createError(400, "Please try to login")
-//     }
-
-//     const ticket = await oAuth2Client.verifyIdToken({
-//       idToken: credential,
-//       audience: process.env.CLIENT_ID,
-//     });
-
-//     const payloadFromGoogle = ticket.getPayload();
-//     const googleId = payloadFromGoogle["sub"];
-//     const email = payloadFromGoogle["email"];
-//     const firstName = payloadFromGoogle["given_name"];
-//     const lastName = payloadFromGoogle["family_name"];
-
-//     let user = await prisma.user.findUnique({
-//       where: { email },
-//     });
-
-//     if (!user) {
-//       user = await prisma.user.create({
-//         data: {
-//           firstName,
-//           lastName,
-//           email,
-//           googleId,
-//         },
-//       });
-//     } else {
-//       if (!user.googleId) {
-//         user = await prisma.user.update({
-//           where: { email },
-//           data: { googleId },
-//         });
-//       }
-//     }
-
-//     const payload = {
-//       id: user.id,
-//     };
-
-//     const token = jwt.sign(payload, process.env.SECRET_KEY, {
-//       expiresIn: "1d",
-//     });
-
-//     res.json({ token });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 
 
 const https = require('https');
@@ -368,7 +328,7 @@ exports.googleLogin = async (req, res, next) => {
 
           // ส่ง JWT token กลับไปยังไคลเอนต์
           const { password: ps, role, createdAt, updatedAt, resetPasswordToken, status, ...respData } = user
-          res.json({ token ,user : respData});
+          res.json({ token, user: respData });
         } catch (error) {
           console.error("Error parsing Google user info:", error);
           res.status(500).json({ message: "Failed to parse Google user info" });
