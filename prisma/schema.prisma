@@ -22,6 +22,7 @@ model User {
   updatedAt          DateTime  @updatedAt @map("updated_at")
   resetPasswordToken String?   @map("reset_password_token")
   status             Status    @default(ACTIVE)
+  image              String?
 
   partner    Partner?
   reviews    Review[]
