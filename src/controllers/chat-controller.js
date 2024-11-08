@@ -63,6 +63,12 @@ module.exports.userChat = async (io, socket) => {
                         },
                         take: 1, // Take only the latest message
                     },
+                    user : {
+                        select : {
+                            email : true,
+                            image : true
+                        }
+                    }
                 },
             })
             io.to('admin').emit('userMessage', { data: message })
@@ -120,6 +126,12 @@ module.exports.adminChat = async (io, socket) => {
                     },
                     take: 1, // Take only the latest message
                 },
+                user : {
+                    select : {
+                        email : true,
+                        image : true
+                    }
+                }
             },
         })
         socket.emit('adminJoinComplete',allLastMessage)
@@ -129,10 +141,13 @@ module.exports.adminChat = async (io, socket) => {
             const room = await prisma.chatbox.findUnique({
                 where: {
                     id: roomID
+                },include : {
+                    messages  :true,
+                    user : true
                 }
             })
             socket.join(room.id)
-            socket.emit('joinComplete', ({ message: 'you have success join a chat' }))
+            socket.emit('joinComplete', ({ message: 'you have success join a chat' ,room : room }))
             socket.removeAllListeners('message')
             socket.removeAllListeners('leaveRoom')
             socket.on('message', async (msg) => {
@@ -154,10 +169,17 @@ module.exports.adminChat = async (io, socket) => {
                             },
                             take: 1, // Take only the latest message
                         },
+                        user : {
+                            select : {
+                                email : true,
+                                image : true
+                            }
+                        }
+                        
                     },
                 })
                 io.to('admin').emit('userMessage', { data: message })
-                io.to(chatRoom.id).emit('message', { data: addMessage })
+                io.to(room.id).emit('message', { data: addMessage })
             })
             socket.on('leaveRoom', () => {
                 socket.leave(room.id)
