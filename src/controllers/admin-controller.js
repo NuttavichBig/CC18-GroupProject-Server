@@ -266,13 +266,13 @@ exports.updatePromotion = async (req, res, next) => {
         res.json({ message: "Update promotion success", promotion: updatePromotion })
 
     } catch (error) {
+        console.log('firstError')
         next(error)
     }
 }
 exports.deletePromotion = async (req, res, next) => {
     try {
         const {promotionId} =req.params
-
         //check exist
         const promotion = await prisma.promotion.findUnique({
             where: {
