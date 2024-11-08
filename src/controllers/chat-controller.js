@@ -8,7 +8,6 @@ module.exports.userChat = async (io, socket) => {
     try {
         let chatRoom = null
         const authorization = socket?.handshake?.headers?.authorization
-        console.log(authorization)
         // const authorization = socket?.handshake?.headers?.token
         // console.log(socket.handshake)
         if (authorization) {
@@ -24,7 +23,6 @@ module.exports.userChat = async (io, socket) => {
                     id: payLoad.id
                 }
             })
-            console.log(findUSer)
             if (!findUSer) {
                 return createError(401, "Your token invalid")
             }
