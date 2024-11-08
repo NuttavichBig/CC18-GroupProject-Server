@@ -66,4 +66,10 @@ module.exports.updateReviewSchema = Joi.object({
             'number.base': "Rating must be a number",
             'number.integer': "Rating must be an integer",
         }),
+    deleteImg: Joi
+        .boolean()
+        .default(false)
+        .messages({
+            'boolean.base': "Delete image should be a boolean"
+        })
 })

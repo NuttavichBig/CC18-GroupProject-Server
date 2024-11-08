@@ -17,7 +17,16 @@ exports.getPartnerInfo = async (req, res, next) => {
       },
     });
 
-    res.json(partnerInfo);
+    const activeHotel = await prisma.hotel.findFirst({
+      where : {
+        partnerId : partnerInfo.id,
+        isActive : true
+      
+      
+      }
+    })
+
+    res.json({partner : partnerInfo, hotel : activeHotel});
   } catch (error) {
     next(error);
   }
