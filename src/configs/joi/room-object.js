@@ -19,7 +19,7 @@ module.exports.createRoomSchema = Joi.object({
         }),
     type: Joi
         .string()
-        .valid('SUITE', 'DOUBLE', 'MASTER')
+        .valid('SINGLE', 'DOUBLE', 'MASTER')
         .required()
         .messages({
             'any.only': 'Order by must be either "asc" or "desc"',
@@ -99,7 +99,7 @@ module.exports.updateRoomSchema = Joi.object({
         }),
     type: Joi
         .string()
-        .valid('SUITE', 'DOUBLE', 'MASTER')
+        .valid('SINGLE', 'DOUBLE', 'MASTER')
         .optional()
         .messages({
             'any.only': 'Order by must be either "asc" or "desc"',

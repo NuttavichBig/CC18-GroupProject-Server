@@ -13,7 +13,7 @@ exports.createRoom = async (req, res, next) => {
       type,
       price,
       recommendPeople,
-      facilityRoom,
+      facilitiesRoom,
       size,
       roomAmount,
     } = req.input;
@@ -50,7 +50,7 @@ exports.createRoom = async (req, res, next) => {
         fs.unlink(file.path); // Remove the file after upload
       }
     }
-    console.log(facilityRoom)
+    console.log(facilitiesRoom)
     const newRoom = await prisma.room.create({
       data: {
         name,
@@ -64,19 +64,19 @@ exports.createRoom = async (req, res, next) => {
         size: Number(size),
         roomAmount: Number(roomAmount),
         facilitiesRoom: {
-          create: facilityRoom,
+          create: { ...facilitiesRoom },
         },
       },
     });
 
 
-    const RoomImg = uploadResults.map((el) => ({
+    const roomImg = uploadResults.map((el) => ({
       img: el,
       roomId: newRoom.id, // Associate each image with the created room
     }));
 
     await prisma.roomImg.createMany({
-      data: RoomImg,
+      data: roomImg,
     });
     res.json(newRoom); // Create Image room
   } catch (error) {
@@ -94,7 +94,7 @@ exports.updateRoom = async (req, res, next) => {
       price,
       size,
       recommendPeople,
-      facilityRoom,
+      facilitiesRoom,
       roomAmount,
       deleteImage,
     } = req.input;
@@ -152,7 +152,7 @@ exports.updateRoom = async (req, res, next) => {
         recommendPeople: Number(recommendPeople),
         roomAmount: Number(roomAmount),
         facilitiesRoom: {
-          update: facilityRoom,
+          update: facilitiesRoom,
         },
       },
     });
