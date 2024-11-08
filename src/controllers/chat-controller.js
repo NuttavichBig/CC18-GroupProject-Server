@@ -8,6 +8,7 @@ module.exports.userChat = async (io, socket) => {
     try {
         let chatRoom = null
         const authorization = socket?.handshake?.headers?.authorization
+        console.log(authorization)
         // const authorization = socket?.handshake?.headers?.token
         // console.log(socket.handshake)
         if (authorization) {
@@ -23,13 +24,14 @@ module.exports.userChat = async (io, socket) => {
                     id: payLoad.id
                 }
             })
+            console.log(findUSer)
             if (!findUSer) {
                 return createError(401, "Your token invalid")
             }
             socket.user = findUSer
             chatRoom = await prisma.chatbox.create({
                 data: {
-                    userId: findUSer.id,
+                    userId: socket.user.id,
                     socketId: socket.id
                 }
             })
@@ -185,7 +187,7 @@ module.exports.adminChat = async (io, socket) => {
                 socket.leave(room.id)
             })
         })
-
+        
     } catch (err) {
         console.log(err.message)
         socket.emit("error", err.message)
