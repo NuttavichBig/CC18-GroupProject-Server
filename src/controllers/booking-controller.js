@@ -82,54 +82,89 @@ exports.getBookingByUUID = async (req, res, next) => {
   }
 };
 exports.createBooking = async (req, res, next) => {
-  const { userId, promotionId, totalPrice, checkInDate, checkOutDate, hotelId } = req.input
+  const { userId, promotionId, totalPrice, checkinDate, checkoutDate, hotelId } = req.input;
 
   try {
-
     let userHavePromotionId = null;
+
+    // Check if a promotion is being applied and validate it
     if (promotionId) {
-      const userPromotion = await prisma.userHavePromotion.findFirst({
+      if (!userId) {
+        throw createError(400, "Guests cannot use promotions");
+      }
+
+      console.log(`Checking or creating promotion for userId: ${userId}, promotionId: ${promotionId}`);
+
+      // Find promotion details in the promotion table
+      const promotion = await prisma.promotion.findFirst({
+        where: {
+          id: promotionId,
+          isActive: true,
+          startDate: { lte: new Date() },
+          endDate: { gte: new Date() },
+        },
+      });
+
+      // Check if the promotion is valid and available
+      if (!promotion) {
+        throw createError(400, "Invalid or expired promotion");
+      }
+
+      // Check if a record exists in userHavePromotion for this user and promotion
+      let userPromotion = await prisma.userHavePromotion.findFirst({
         where: {
           userId: userId,
           promotionId: promotionId,
-          isUsed: false
-        }
+          isUsed: false,
+        },
       });
 
+      // If no record exists, create a new entry in userHavePromotion
       if (!userPromotion) {
-        throw createError(400, "Invalid or already used promotion")
+        userPromotion = await prisma.userHavePromotion.create({
+          data: {
+            userId: userId,
+            promotionId: promotionId,
+            isUsed: false, // New record is not used yet
+          },
+        });
+        console.log("Created new userHavePromotion record:", userPromotion);
       }
 
       userHavePromotionId = userPromotion.id;
     }
 
+    // Create the booking record
     const newBooking = await prisma.booking.create({
       data: {
         UUID: generateUUID(),
-        userId,
+        userId: userId || null,
         hotelId,
         userHavePromotionId,
         totalPrice,
-        checkinDate: checkInDate,
-        checkoutDate: checkOutDate
-      },include :{
-        userHavePromotions : {
-          include : {
-            promotion : true
-          }
-        }
-      }
+        checkinDate,
+        checkoutDate,
+      },
+      include: {
+        userHavePromotions: {
+          include: {
+            promotion: true,
+          },
+        },
+      },
     });
 
+    // Mark the promotion as used if applicable
     if (userHavePromotionId) {
       await prisma.userHavePromotion.update({
         where: { id: userHavePromotionId },
-        data: { isUsed: true }
+        data: { isUsed: true },
       });
     }
 
-    res.json({message : "Booking success",booking : newBooking})
+    res.json({ message: "Booking success", booking: newBooking });
   } catch (error) {
-    next(error)
+    console.error("Error creating booking:", error);
+    next(error);
   }
 };

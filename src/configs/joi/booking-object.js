@@ -96,5 +96,14 @@ module.exports.createBookingSchema = Joi.object({
             'date.base': 'Checkout date must be a valid date.',
             'date.min': 'Checkout date must be later than check-in date.',
             'any.required': 'Checkout date is required.',
-        })
+        }),
+        hotelId: Joi
+        .number()
+        .integer()
+        .required()
+        .messages({
+            'number.base': "hotelId must be a number",
+            'number.integer': "hotelId must be an integer",
+            'any.required': 'hotelId is required'
+        }),
 })
