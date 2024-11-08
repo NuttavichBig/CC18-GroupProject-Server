@@ -1,5 +1,6 @@
 const Joi = require("joi")
-
+const startOfToday = new Date();
+startOfToday.setHours(0,0,0,0)
 
 // booking path
 module.exports.getBookingQuerySchema = Joi.object({
@@ -51,7 +52,7 @@ module.exports.createBookingSchema = Joi.object({
     userId: Joi
         .number()
         .integer()
-        .required()
+        .optional()
         .messages({
             'number.base': "userId must be a number",
             'number.integer': "userId must be an integer",
@@ -60,7 +61,7 @@ module.exports.createBookingSchema = Joi.object({
     promotionId: Joi
         .number()
         .integer()
-        .required()
+        .optional()
         .messages({
             'number.base': "promotionId must be a number",
             'number.integer': "promotionId must be an integer",
@@ -79,7 +80,7 @@ module.exports.createBookingSchema = Joi.object({
     checkinDate: Joi
         .date()
         .iso()
-        .min('now')
+        .min(startOfToday)
         .required()
         .messages({
             'date.base': 'Check-in date must be a valid date.',

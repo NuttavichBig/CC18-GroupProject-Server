@@ -122,7 +122,31 @@ module.exports.getHotelQuerySchema = Joi.object({
         .messages({
             'date.base': 'Checkout date must be a valid date.',
             'date.min': 'Checkout date must be later than check-in date.',
-        })
+        }),
+        guest : Joi
+        .number()
+        .integer()
+        .optional()
+        .messages({
+            'number.base': 'Guest must be a number',
+            'number.integer': 'Guest must be an integer',
+        }), 
+        roomAmount : Joi
+        .number()
+        .integer()
+        .optional()
+        .messages({
+            'number.base': 'Room amount must be a number',
+            'number.integer': 'Room amount must be an integer',
+        }), 
+        roomType: Joi
+        .string()
+        .valid('SUITE', 'DOUBLE', 'MASTER')
+        .optional()
+        .messages({
+            'any.only': 'Order by must be either "asc" or "desc"',
+            'string.base': 'Order by must be a string'
+        }),
 })
 // .and('maxPrice', 'minPrice'); // Sure that ,maxPrice amd minPrice are provided together
 

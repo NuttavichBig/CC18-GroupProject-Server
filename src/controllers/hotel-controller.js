@@ -8,13 +8,13 @@ const haversine = require("../utility/haversine");
 
 exports.getHotels = async (req, res, next) => {
     try {
-        const { search, maxPrice, minPrice, star, orderBy, sortBy, facilities, limit, page, isActive, lat, lng, checkinDate, checkoutDate } = req.input
+        const { search, maxPrice, minPrice, star, orderBy, sortBy, facilities, limit, page, isActive, lat, lng, checkinDate, checkoutDate, guest, roomAmount, roomType } = req.input
         const maxDistance = 8000
-        // make initial condition
+        // make initial condition'
         const condition = {
             orderBy: {},
-            take: limit,
-            skip: (page - 1) * limit,
+            // take: limit,
+            // skip: ((page - 1) * limit),
             include: {
                 rooms: true,
                 reviews: true,
@@ -22,7 +22,7 @@ exports.getHotels = async (req, res, next) => {
             },
             where: {},
         }
-
+        //  console.log(condition.skip,condition.take)
 
         // check nest sorted
         if (sortBy !== 'price' && sortBy !== 'rating') {
@@ -57,8 +57,9 @@ exports.getHotels = async (req, res, next) => {
             }
         }
 
-
+        // console.log(condition)
         const getHotels = await prisma.hotel.findMany(condition)
+
         let finalHotels = []
         if (getHotels.length > 0) {
             // around location filter
@@ -74,7 +75,6 @@ exports.getHotels = async (req, res, next) => {
                     }
                     return false
                 })
-                console.log(nearbyHotels)
                 if(nearbyHotels.length === 0){
                     return res.json({hotels : nearbyHotels})
                 }
@@ -90,7 +90,6 @@ exports.getHotels = async (req, res, next) => {
                 }
                 return hotel
             })
-
 
             //filter for date
             if (checkinDate) {
@@ -110,6 +109,18 @@ exports.getHotels = async (req, res, next) => {
                             availableRoom--
                             break;
                         }
+                        if(guest){
+                            if(guest > room.recommendPeople){
+                                availableRoom--
+                                break;
+                            }
+                        }
+                        if(roomType){
+                            if(roomType !== room.type){
+                                availableRoom--
+                                break;
+                            }
+                        }
                         let isAvailable = true
                         for (const date of dateList) {
                             const bookNo = await prisma.booking.count({
@@ -123,7 +134,7 @@ exports.getHotels = async (req, res, next) => {
                                     }
                                 }
                             })
-                            if (room.roomAmount - bookNo < 0) {
+                            if (room.roomAmount - bookNo < roomAmount) {
                                 isAvailable = false
                                 break;
                             }
@@ -171,7 +182,9 @@ exports.getHotels = async (req, res, next) => {
             })
         }
 
-        res.json({ hotels: finalHotels })
+        const skip = (page-1)*limit
+        const takeHotels = finalHotels.splice(skip,limit)
+        res.json({ hotels: takeHotels })
     } catch (error) {
         next(error)
     }

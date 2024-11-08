@@ -8,7 +8,7 @@ const queryArrayMaker =require("../middlewares/queryArrayMaker")
 const {getHotelQueryValidator,createHotelValidator,updateHotelValidator} = require("../middlewares/validator")
 
 
-router.get('/',queryArrayMaker('facilities'),getHotelQueryValidator,hotelController.getHotels) // query
+router.get('/',getHotelQueryValidator,hotelController.getHotels) // query
 router.get('/:hotelId',hotelController.getHotelById)
 router.post('/',authenticate,upload.single("img"),createHotelValidator,hotelController.createHotel) // authen
 router.patch('/:hotelId',authenticate,checkRole.partnerCheck,upload.single("img"),updateHotelValidator,hotelController.updateHotel) // authen

@@ -9,7 +9,13 @@ exports.getAllReviews = async (req, res, next) => {
     const { page, limit } = req.input
     const skip = (page - 1) * limit
     try {
+        const where = {}
+        if(req.user.role !== 'ADMIN'){
+            where.userId = req.user.id
+        }
+        console.log(where)
         const reviews = await prisma.review.findMany({
+            where,
             skip,
             take: limit,
             include: {
@@ -18,6 +24,7 @@ exports.getAllReviews = async (req, res, next) => {
                 booking: true
             }
         })
+        console.log(reviews)
         const totalReviews = await prisma.review.count()
         res.json({
             total: totalReviews,
@@ -112,6 +119,12 @@ exports.editReview = async (req, res, next) => {
         }
 
         // image handle
+        if(req.input.deleteImg){
+            if (review.img) {
+                cloudinary.uploader.destroy(getPublicId(review.img))
+            }
+            req.input.img = null
+        }
         if (req.file) {
             const uploadedFile = await cloudinary.uploader.upload(req.file.path, {
                 overwrite: true,
@@ -124,16 +137,20 @@ exports.editReview = async (req, res, next) => {
             }
         }
 
-
+        const {deleteImg,...data} = req.input
         const updatedReview = await prisma.review.update({
             where: {
                 id: Number(reviewId)
             },
-            data: req.input
+            data: data
+            ,include : {
+                hotel : true
+            }
         })
         res.json({message : "update success" , review : updatedReview})
 
     } catch (error) {
+        console.log(error)
         next(error)
     }
 }
@@ -164,7 +181,9 @@ exports.deleteReview = async (req, res, next) => {
                 return createError(403, "You can only delete your own reviews")
             }
         }
-        cloudinary.uploader.destroy(getPublicId(review.img))
+        if(review.img){
+            cloudinary.uploader.destroy(getPublicId(review.img))
+        }
         const deletedReview = await prisma.review.delete({
             where: {
                 id: Number(reviewId)
@@ -174,6 +193,7 @@ exports.deleteReview = async (req, res, next) => {
 
 
     } catch (error) {
+        console.log(error)
         next(error)
     }
 }
