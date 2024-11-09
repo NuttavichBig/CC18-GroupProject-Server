@@ -7,7 +7,7 @@ const checkRole = require("../middlewares/checkRole")
 
 
 router.get('/',getPromotionQueryValidator,promotionController.getAllPromotions) // query
-router.get('/:promotionId',promotionController.getPromotionById)
+router.get('/:promotionCode',promotionController.getPromotionById)
 router.post('/get',authenticate,checkRole.userCheck,userGetPromotionValidator,promotionController.userGetPromotions) // authen
 
 

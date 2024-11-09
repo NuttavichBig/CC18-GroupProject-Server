@@ -2208,6 +2208,10 @@ const bookingData = [
     userId: 6, 
     hotelId: 1,
     userHavePromotionId: 1,
+    firstName : 'AAFirsstName',
+    lastName : 'AALastname',
+    email : 'user01@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-67890",
@@ -2218,6 +2222,10 @@ const bookingData = [
     userId: 6,
     hotelId: 2,
     userHavePromotionId: 6, 
+    firstName : 'BBFirsstName',
+    lastName : 'BBLastname',
+    email : 'user01@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-11121",
@@ -2228,6 +2236,10 @@ const bookingData = [
     userId: 7,
     hotelId: 3,
     userHavePromotionId: 2, 
+    firstName : 'CCFirsstName',
+    lastName : 'CCLastname',
+    email : 'user02@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-22232",
@@ -2238,6 +2250,10 @@ const bookingData = [
     userId: 8,
     hotelId: 4,
     userHavePromotionId: 3,
+    firstName : 'DDFirsstName',
+    lastName : 'DDLastname',
+    email : 'user03@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-33343",
@@ -2248,6 +2264,10 @@ const bookingData = [
     userId: 9,
     hotelId: 5,
     userHavePromotionId: null,
+    firstName : 'EEFirsstName',
+    lastName : 'EELastname',
+    email : 'user04@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-44454",
@@ -2258,6 +2278,10 @@ const bookingData = [
     userId: 6,
     hotelId: 2,
     userHavePromotionId: 1,
+    firstName : 'FFFirsstName',
+    lastName : 'FFLastname',
+    email : 'user01@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-55565",
@@ -2268,6 +2292,10 @@ const bookingData = [
     userId: 7,
     hotelId: 3,
     userHavePromotionId: null, 
+    firstName : 'CCFirsstName',
+    lastName : 'CCLastname',
+    email : 'user02@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-66676",
@@ -2278,6 +2306,10 @@ const bookingData = [
     userId: 8,
     hotelId: 4,
     userHavePromotionId: null, 
+    firstName : 'GGFirsstName',
+    lastName : 'GGLastname',
+    email : 'user03@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-77787",
@@ -2288,6 +2320,10 @@ const bookingData = [
     userId: 10,
     hotelId: 5,
     userHavePromotionId: 5,
+    firstName : 'XXFirsstName',
+    lastName : 'XXLastname',
+    email : 'user05@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-88898",
@@ -2298,6 +2334,10 @@ const bookingData = [
     userId: 10,
     hotelId: 2,
     userHavePromotionId: null, 
+    firstName : 'XXFirsstName',
+    lastName : 'XXLastname',
+    email : 'user05@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-99909",
@@ -2308,6 +2348,10 @@ const bookingData = [
     userId: 6,
     hotelId: 1,
     userHavePromotionId: 1,
+    firstName : 'AAFirsstName',
+    lastName : 'AALastname',
+    email : 'user01@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-10101",
@@ -2318,6 +2362,10 @@ const bookingData = [
     userId: 7,
     hotelId: 5,
     userHavePromotionId: 2,
+    firstName : 'NMNFirsstName',
+    lastName : 'NMNLastname',
+    email : 'user02@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-11112",
@@ -2328,6 +2376,10 @@ const bookingData = [
     userId: 10,
     hotelId: 3,
     userHavePromotionId: null,
+    firstName : 'XXFirsstName',
+    lastName : 'XXLastname',
+    email : 'user05@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-12123",
@@ -2338,6 +2390,10 @@ const bookingData = [
     userId: 9,
     hotelId: 4,
     userHavePromotionId: 4,
+    firstName : 'TTFirsstName',
+    lastName : 'TTLastname',
+    email : 'user04@mail.com',
+    phone :"0123456789"
   },
   {
     UUID: "uuid-13134",
@@ -2348,6 +2404,10 @@ const bookingData = [
     userId: 8,
     hotelId: 3,
     userHavePromotionId: null, 
+    firstName : 'RRFirsstName',
+    lastName : 'RRLastname',
+    email : 'user03@mail.com',
+    phone :"0123456789"
   },
 ];
 const bookingRoomsData = [

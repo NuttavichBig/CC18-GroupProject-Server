@@ -46,10 +46,10 @@ exports.getAllPromotions = async (req, res, next) => {
 }
 
 exports.getPromotionById = async (req, res, next) => {
-    const {promotionId} = req.params
+    const {promotionCode} = req.params
     try{
-        const promotion = await prisma.promotion.findUnique({
-            where:{ id: Number(promotionId) },
+        const promotion = await prisma.promotion.findFirst({
+            where:{ code: promotionCode },
         })
         if(!promotion){
             throw createError(404, "Promotion not found")
