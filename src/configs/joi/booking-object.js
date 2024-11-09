@@ -106,4 +106,22 @@ module.exports.createBookingSchema = Joi.object({
             'number.integer': "hotelId must be an integer",
             'any.required': 'hotelId is required'
         }),
+        roomId :  Joi
+        .number()
+        .integer()
+        .required()
+        .messages({
+            'number.base': "Room id must be a number",
+            'number.integer': "Room id must be an integer",
+            'any.required': 'Room id is required'
+        }),
+        amount : Joi
+        .number()
+        .integer()
+        .required()
+        .messages({
+            'number.base': "Amount must be a number",
+            'number.integer': "Amount must be an integer",
+            'any.required': 'Amount is required'
+        }),
 })

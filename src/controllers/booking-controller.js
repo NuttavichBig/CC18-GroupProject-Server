@@ -24,10 +24,12 @@ exports.getAllBookings = async (req, res, next) => {
             partnerId: true
           }
         },
-        bookingRooms: {
-          select: {
-            amountRoom: true,
-            rooms: true
+        include : {
+          bookingRooms: {
+            select: {
+              amountRoom: true,
+              rooms: true
+            }
           }
         },
         users: {
@@ -88,11 +90,11 @@ exports.getBookingByUUID = async (req, res, next) => {
   }
 };
 exports.createBooking = async (req, res, next) => {
-  const { userId, promotionId, totalPrice, checkinDate, checkoutDate, hotelId } = req.input;
+  const { userId, promotionId, totalPrice, checkinDate, checkoutDate, hotelId,roomId ,amount} = req.input;
 
   try {
     let userHavePromotionId = null;
-
+    console.log(req.input)
     // Check if a promotion is being applied and validate it
     if (promotionId) {
       if (!userId) {
@@ -150,6 +152,12 @@ exports.createBooking = async (req, res, next) => {
         totalPrice,
         checkinDate,
         checkoutDate,
+        bookingRooms : {
+          create : {
+            roomId : +roomId,
+            amountRoom : +amount
+          }
+        }
       },
       include: {
         userHavePromotions: {
@@ -163,7 +171,7 @@ exports.createBooking = async (req, res, next) => {
     // Mark the promotion as used if applicable
     if (userHavePromotionId) {
       await prisma.userHavePromotion.update({
-        where: { id: userHavePromotionId },
+        where: { id: +userHavePromotionId },
         data: { isUsed: true },
       });
     }
