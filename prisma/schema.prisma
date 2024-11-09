@@ -178,6 +178,10 @@ model Booking {
   userId              Int?          @map("user_id")
   hotelId             Int           @map("hotel_id")
   userHavePromotionId Int?          @map("user_have_promotion_id")
+  firstName           String        @map("first_name")
+  lastName            String        @map("last_name")
+  phone               String
+  email               String
 
   users              User?              @relation(fields: [userId], references: [id])
   hotels             Hotel              @relation(fields: [hotelId], references: [id])

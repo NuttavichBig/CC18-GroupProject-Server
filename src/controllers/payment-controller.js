@@ -1,6 +1,7 @@
 const prisma = require("../configs/prisma");
 const createError = require("../utility/createError");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const nodemailer = require("nodemailer")
 
 exports.payment = async (req, res, next) => {
     try {
@@ -47,6 +48,18 @@ exports.paymentSuccess = async (req, res, next) => {
         const booking = await prisma.booking.update({
             where: { id: Number(bookingId) },
             data: { status: "CONFIRMED" },
+            include : {
+                hotels : true,
+                bookingRooms :{
+                    include :{
+                        rooms : {
+                            include : {
+                                images : true
+                            }
+                        }
+                    }
+                }
+            }
         });
 
         // If promotionId is provided, find and update userHavePromotion, or create a new one if not found
@@ -88,7 +101,7 @@ exports.paymentSuccess = async (req, res, next) => {
         }
         console.log(bookingId)
         // Create payment record
-        await prisma.payment.create({
+       const payment =  await prisma.payment.create({
             data: {
                 paymentMethod: type,
                 bookingId: Number(bookingId),
@@ -96,7 +109,47 @@ exports.paymentSuccess = async (req, res, next) => {
             },
         });
 
-        res.json({ message: "Create Payment Success" ,booking : booking});
+    // email
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'cc18hotelbook@gmail.com',
+          pass: 'qgsfjdpcajvdfxkt'
+        }
+      });
+      const checkInDate = new Date(booking.checkinDate)
+        const checkOutDate = new Date(booking.checkoutDate)
+        const checkInDateString = `${checkInDate.getFullYear()}-${checkInDate.getMonth().toString().padStart(2, '0')}-${checkInDate.getDate().toString().padStart(2, '0')}`
+        const checkOutDateString = `${checkOutDate.getFullYear()}-${checkOutDate.getMonth().toString().padStart(2, '0')}-${checkOutDate.getDate().toString().padStart(2, '0')}`
+      const mailOptions = {
+        from: 'cc18hotelbook@gmail.com',
+        to: booking.email,
+        subject: '[Hotel Book]Your Booking Has been completed',
+        html: `
+      <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+        <h2 style="text-align: center; color: #4a90e2;">Your Booking has Completed</h2>
+        <div>
+          <p style="text-align: center; color: #555; font-size: 16px;">Your Booking ID : ${booking.UUID}</p>
+          <p style="text-align: center; color: #555; font-size: 16px;">Booker name : ${booking.firstName+' '+booking.lastName}</p>
+          <p style="text-align: center; color: #555; font-size: 16px;">Hotel : ${booking.hotels.name}</p>
+          <p style="text-align: center; color: #555; font-size: 16px;">Address : ${booking.hotels.address}</p>
+          <p style="text-align: center; color: #555; font-size: 16px;">Check-in : ${checkInDateString}</p>
+          <p style="text-align: center; color: #555; font-size: 16px;">Check-out : ${checkOutDateString}</p>
+        </div>
+        <p style="text-align: center; color: #555; font-size: 14px;">
+          Contact us for more information or miss some information cc18hotelbook@gmail.com .
+        </p>
+      </div>`
+      };
+      transporter.sendMail(mailOptions, async (error, info) => {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+
+        res.json({ message: "Create Payment Success" ,booking : booking,payment : payment });
     } catch (error) {
         console.error("Error in paymentSuccess:", error);
         next(error);

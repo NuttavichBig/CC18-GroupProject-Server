@@ -90,7 +90,7 @@ exports.getBookingByUUID = async (req, res, next) => {
   }
 };
 exports.createBooking = async (req, res, next) => {
-  const { userId, promotionId, totalPrice, checkinDate, checkoutDate, hotelId,roomId ,amount} = req.input;
+  const { userId, promotionId, totalPrice, checkinDate, checkoutDate, hotelId,roomId ,amount,firstName ,lastName ,email ,phone} = req.input;
 
   try {
     let userHavePromotionId = null;
@@ -152,6 +152,10 @@ exports.createBooking = async (req, res, next) => {
         totalPrice,
         checkinDate,
         checkoutDate,
+        firstName,
+        lastName,
+        email,
+        phone,
         bookingRooms : {
           create : {
             roomId : +roomId,
