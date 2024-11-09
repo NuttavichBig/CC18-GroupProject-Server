@@ -33,6 +33,16 @@ exports.paymentSuccess = async (req, res, next) => {
             return next(createError(404, "Booking not found"));
         }
 
+        // checking already pay
+        const existingPayment = await prisma.payment.findFirst({
+            where : {
+                bookingId : Number(bookingId)
+            }
+        })
+        if(existingPayment){
+            return createError(409,"Payment for this booking already exist")
+        }
+
         // Update booking status to "CONFIRMED"
         await prisma.booking.update({
             where: { id: Number(bookingId) },
@@ -76,7 +86,7 @@ exports.paymentSuccess = async (req, res, next) => {
         } else {
             throw createError(400, "Invalid payment method type");
         }
-
+        console.log(bookingId)
         // Create payment record
         await prisma.payment.create({
             data: {
