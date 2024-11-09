@@ -157,6 +157,7 @@ exports.editReview = async (req, res, next) => {
 exports.deleteReview = async (req, res, next) => {
     const { reviewId } = req.params
     const userId = req.user ? req.user.id : null
+    console.log('first')
     try {
         const review = await prisma.review.findUnique({
             where: {
@@ -166,7 +167,9 @@ exports.deleteReview = async (req, res, next) => {
         if (!review) {
             throw createError(404, "Review not found")
         }
+        console.log('2')
         const userRole = req.user ? req.user.role : null
+        console.log('user role', userRole)
         if (userRole !== "ADMIN") {
             // const deletedReview = await prisma.review.delete({
             //     where: {
@@ -194,3 +197,5 @@ exports.deleteReview = async (req, res, next) => {
         next(error)
     }
 }
+
+

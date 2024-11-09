@@ -24,6 +24,12 @@ exports.getAllBookings = async (req, res, next) => {
             partnerId: true
           }
         },
+        bookingRooms: {
+          select: {
+            amountRoom: true,
+            rooms: true
+          }
+        },
         users: {
           select: {
             email: true,
