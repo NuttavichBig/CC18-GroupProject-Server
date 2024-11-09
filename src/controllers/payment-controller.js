@@ -44,7 +44,7 @@ exports.paymentSuccess = async (req, res, next) => {
         }
 
         // Update booking status to "CONFIRMED"
-        await prisma.booking.update({
+        const booking = await prisma.booking.update({
             where: { id: Number(bookingId) },
             data: { status: "CONFIRMED" },
         });
@@ -96,7 +96,7 @@ exports.paymentSuccess = async (req, res, next) => {
             },
         });
 
-        res.json({ message: "Create Payment Success" });
+        res.json({ message: "Create Payment Success" ,booking : booking});
     } catch (error) {
         console.error("Error in paymentSuccess:", error);
         next(error);
