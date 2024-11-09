@@ -29,7 +29,7 @@ module.exports.userChat = async (io, socket) => {
             socket.user = findUSer
             chatRoom = await prisma.chatbox.create({
                 data: {
-                    userId: findUSer.id,
+                    userId: socket.user.id,
                     socketId: socket.id
                 }
             })
@@ -185,7 +185,7 @@ module.exports.adminChat = async (io, socket) => {
                 socket.leave(room.id)
             })
         })
-
+        
     } catch (err) {
         console.log(err.message)
         socket.emit("error", err.message)
