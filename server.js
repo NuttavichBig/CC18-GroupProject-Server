@@ -36,7 +36,7 @@ app.use(express.json());
 // API Path
 app.use("/auth", authRoutes);
 app.use("/hotel", hotelRoute);
-app.use("/room", authenticate, checkRole.partnerCheck, roomRoute); // authen
+app.use("/room", authenticate, roomRoute); // authen
 app.use("/review", authenticate, reviewRoute);
 app.use("/booking", bookingRoute);
 app.use("/promotion", promotionRoute);

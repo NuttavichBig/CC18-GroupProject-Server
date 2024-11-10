@@ -4,7 +4,6 @@ const hotelController = require("../controllers/hotel-controller")
 const authenticate = require("../middlewares/authenticate")
 const checkRole = require("../middlewares/checkRole")
 const upload = require("../middlewares/upload")
-const queryArrayMaker =require("../middlewares/queryArrayMaker")
 const {getHotelQueryValidator,createHotelValidator,updateHotelValidator} = require("../middlewares/validator")
 
 
