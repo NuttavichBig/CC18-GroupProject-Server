@@ -336,6 +336,9 @@ exports.updateHotel = async (req, res, next) => {
                     }
                 }
             },
+            include:{
+                facilitiesHotel : true
+            }
         })
         res.json(updatedHotel)
     } catch (error) {

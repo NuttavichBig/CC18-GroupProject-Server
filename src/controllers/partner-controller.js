@@ -21,8 +21,9 @@ exports.getPartnerInfo = async (req, res, next) => {
       where : {
         partnerId : partnerInfo.id,
         isActive : true
-      
-      
+      },
+      include :{
+        facilitiesHotel :true
       }
     })
 
