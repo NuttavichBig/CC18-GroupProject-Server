@@ -1,8 +1,8 @@
 const prisma = require("../configs/prisma")
 const createError = require("../utility/createError")
-const {v4 : uuidv4} = require('uuid')
+const { v4: uuidv4 } = require('uuid')
 
-function generateUUID(){
+function generateUUID() {
   return uuidv4()
 }
 
@@ -24,12 +24,10 @@ exports.getAllBookings = async (req, res, next) => {
             partnerId: true
           }
         },
-        include : {
-          bookingRooms: {
-            select: {
-              amountRoom: true,
-              rooms: true
-            }
+        bookingRooms: {
+          select: {
+            amountRoom: true,
+            rooms: true
           }
         },
         users: {
@@ -41,32 +39,34 @@ exports.getAllBookings = async (req, res, next) => {
     }
 
     // check search
-    if(search){
-      condition.where = {OR: [
-        { hotels: { name: { contains: search } } },
-        { UUID: { contains: search } }
-      ]}
+    if (search) {
+      condition.where = {
+        OR: [
+          { hotels: { name: { contains: search } } },
+          { UUID: { contains: search } }
+        ]
+      }
     }
     // check role
-    if(req.user.role === 'USER'){
-      condition.where = {...condition.where,userId : req.user.id}
-    }else if(req.user.role === 'PARTNER'){
-      condition.where = {...condition.where,hotels : {partner : {userId : req.user.id}}}
+    if (req.user.role === 'USER') {
+      condition.where = { ...condition.where, userId: req.user.id }
+    } else if (req.user.role === 'PARTNER') {
+      condition.where = { ...condition.where, hotels: { partner: { userId: req.user.id } } }
     }
 
     const bookings = await prisma.booking.findMany(condition);
-    const {skip:s , take , orderBy:o ,include , ...checkingTotal} = condition
-  const totalBookings = await prisma.booking.count(checkingTotal);
+    const { skip: s, take, orderBy: o, include, ...checkingTotal } = condition
+    const totalBookings = await prisma.booking.count(checkingTotal);
 
-  res.json({
-    total: totalBookings,
-    page,
-    limit,
-    data: bookings,
-  });
-} catch (error) {
-  next(error);
-}
+    res.json({
+      total: totalBookings,
+      page,
+      limit,
+      data: bookings,
+    });
+  } catch (error) {
+    next(error);
+  }
 }
 exports.getBookingByUUID = async (req, res, next) => {
   const { UUID } = req.params;
@@ -90,7 +90,7 @@ exports.getBookingByUUID = async (req, res, next) => {
   }
 };
 exports.createBooking = async (req, res, next) => {
-  const { userId, promotionId, totalPrice, checkinDate, checkoutDate, hotelId,roomId ,amount,firstName ,lastName ,email ,phone} = req.input;
+  const { userId, promotionId, totalPrice, checkinDate, checkoutDate, hotelId, roomId, amount, firstName, lastName, email, phone } = req.input;
 
   try {
     let userHavePromotionId = null;
@@ -156,10 +156,10 @@ exports.createBooking = async (req, res, next) => {
         lastName,
         email,
         phone,
-        bookingRooms : {
-          create : {
-            roomId : +roomId,
-            amountRoom : +amount
+        bookingRooms: {
+          create: {
+            roomId: +roomId,
+            amountRoom: +amount
           }
         }
       },
