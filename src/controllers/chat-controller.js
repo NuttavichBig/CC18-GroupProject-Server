@@ -77,11 +77,17 @@ module.exports.userChat = async (io, socket) => {
 
         // disconnect listener
         socket.on("disconnect", async () => {
-            await prisma.chatbox.delete({
+            console.log('chat room delete')
+            const delChat = await prisma.chatbox.delete({
                 where: {
                     id: chatRoom.id
                 }
             })
+            io.to(chatRoom.id).emit('message', { data: {
+                isAdmin : false,
+                message : 'user has left'
+            } })
+            io.to('admin').emit('userLeave',delChat)
         });
     } catch (err) {
         console.log(err.message)
@@ -146,44 +152,47 @@ module.exports.adminChat = async (io, socket) => {
                     user : true
                 }
             })
-            socket.join(room.id)
-            socket.emit('joinComplete', ({ message: 'you have success join a chat' ,room : room }))
-            socket.removeAllListeners('message')
-            socket.removeAllListeners('leaveRoom')
-            socket.on('message', async (msg) => {
-                const addMessage = await prisma.message.create({
-                    data: {
-                        chatboxId: room.id,
-                        isAdmin: true,
-                        message: msg
-                    }
-                })
-                const message = await prisma.chatbox.findFirst({
-                    where:{
-                     id : addMessage.chatboxId
-                    },
-                    include: {
-                        messages: {
-                            orderBy: {
-                                createdAt: 'desc',
-                            },
-                            take: 1, // Take only the latest message
-                        },
-                        user : {
-                            select : {
-                                email : true,
-                                image : true
-                            }
+            if(room){
+
+                socket.join(room.id)
+                socket.emit('joinComplete', ({ message: 'you have success join a chat' ,room : room }))
+                socket.removeAllListeners('message')
+                socket.removeAllListeners('leaveRoom')
+                socket.on('message', async (msg) => {
+                    const addMessage = await prisma.message.create({
+                        data: {
+                            chatboxId: room.id,
+                            isAdmin: true,
+                            message: msg
                         }
-                        
-                    },
+                    })
+                    const message = await prisma.chatbox.findFirst({
+                        where:{
+                            id : addMessage.chatboxId
+                        },
+                        include: {
+                            messages: {
+                                orderBy: {
+                                    createdAt: 'desc',
+                                },
+                                take: 1, // Take only the latest message
+                            },
+                            user : {
+                                select : {
+                                    email : true,
+                                    image : true
+                                }
+                            }
+                            
+                        },
+                    })
+                    io.to('admin').emit('userMessage', { data: message })
+                    io.to(room.id).emit('message', { data: addMessage })
                 })
-                io.to('admin').emit('userMessage', { data: message })
-                io.to(room.id).emit('message', { data: addMessage })
-            })
-            socket.on('leaveRoom', () => {
-                socket.leave(room.id)
-            })
+                socket.on('leaveRoom', () => {
+                    socket.leave(room.id)
+                })
+            }
         })
         
     } catch (err) {
