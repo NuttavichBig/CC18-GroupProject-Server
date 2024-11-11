@@ -24,5 +24,4 @@ router.delete('/promotion/:promotionId',adminController.deletePromotion)
 // booking
 router.patch('/booking/:bookingId',adminUpdateBookingValidator,adminController.updateBookingStatus)
 
-
 module.exports = router
