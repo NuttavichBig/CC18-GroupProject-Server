@@ -78,7 +78,11 @@ exports.getBookingByUUID = async (req, res, next) => {
         hotels: true,
         bookingRooms : {
           include : {
-            rooms : true
+            rooms : {
+              include :{
+                images : true
+              }
+            }
           }
         }
       }
