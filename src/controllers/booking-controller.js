@@ -76,7 +76,11 @@ exports.getBookingByUUID = async (req, res, next) => {
       where: { UUID },
       include: {
         hotels: true,
-        users: true,
+        bookingRooms : {
+          include : {
+            rooms : true
+          }
+        }
       }
     });
 
