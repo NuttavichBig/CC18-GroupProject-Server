@@ -26,15 +26,26 @@ exports.createRoom = async (req, res, next) => {
     if (!partner) {
       return createError(400, "ํYou are not a partner")
     }
-
-    const hotel = await prisma.hotel.findFirst({
-      where: {
-        partnerId: partner.id,
-        isActive: true
+    let hotel
+    if (req.user.role === 'PARTNER') {
+      hotel = await prisma.hotel.findFirst({
+        where: {
+          partnerId: partner.id,
+          isActive: true
+        }
+      })
+      if (!hotel) {
+        return createError(400, "Please create hotel")
       }
-    })
-    if (!hotel) {
-      return createError(400, "Please create hotel")
+    }else{
+      hotel = await prisma.hotel.findFirst({
+        where : {
+          partnerId : partner.id
+        }
+      })
+      if (!hotel) {
+        return createError(400, "Please create hotel")
+      }
     }
 
     const files = req.files;
@@ -58,8 +69,8 @@ exports.createRoom = async (req, res, next) => {
         type,
         price: Number(price),
         recommendPeople: Number(recommendPeople),
-        hotel :{
-          connect: {id : hotel.id}
+        hotel: {
+          connect: { id: hotel.id }
         },
         size: Number(size),
         roomAmount: Number(roomAmount),
@@ -103,10 +114,10 @@ exports.updateRoom = async (req, res, next) => {
     const room = await prisma.room.findFirst({
       where: {
         id: Number(roomId),
-      },include:{
-        hotel :{
-          select : {
-            partnerId : true
+      }, include: {
+        hotel: {
+          select: {
+            partnerId: true
           }
         }
       }
@@ -116,13 +127,13 @@ exports.updateRoom = async (req, res, next) => {
     }
 
     const partner = await prisma.partner.findUnique({
-      where : {
-        userId : req.user.id
+      where: {
+        userId: req.user.id
       }
     })
 
-    if(room.hotel.partnerId !== partner.id){
-      return createError(401,"You don't have permitted")
+    if (room.hotel.partnerId !== partner.id) {
+      return createError(401, "You don't have permitted")
     }
     //image handle
     const files = req.files;
@@ -158,7 +169,7 @@ exports.updateRoom = async (req, res, next) => {
     });
     const RoomImg = uploadResults.map((el) => ({
       img: el,
-      roomId :+roomId, // Associate each image with the created room
+      roomId: +roomId, // Associate each image with the created room
     }));
     await prisma.roomImg.createMany({
       data: RoomImg,
@@ -167,19 +178,20 @@ exports.updateRoom = async (req, res, next) => {
 
     //DELETE IMAGE    
     if (deleteImage && deleteImage.length > 0) {
-      for(const img of deleteImage) {
-      cloudinary.uploader.destroy(getPublicId(img))
-      const imageId = await prisma.roomImg.findFirst({
-        where : {
-          img : img
-        }
-      })
-      await prisma.roomImg.delete({
-        where : {
-              id : imageId.id
-      }})
+      for (const img of deleteImage) {
+        cloudinary.uploader.destroy(getPublicId(img))
+        const imageId = await prisma.roomImg.findFirst({
+          where: {
+            img: img
+          }
+        })
+        await prisma.roomImg.delete({
+          where: {
+            id: imageId.id
+          }
+        })
       }
-  }
+    }
 
     res.json(updateRoom);
   } catch (error) {
