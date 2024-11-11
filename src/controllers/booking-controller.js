@@ -18,16 +18,16 @@ exports.getAllBookings = async (req, res, next) => {
       take: limit,
       orderBy: { [sortBy]: orderBy },
       include: {
-        hotels: {
-          select: {
-            name: true,
-            partnerId: true
-          }
-        },
+        review : true,
+        hotels: true,
         bookingRooms: {
           select: {
             amountRoom: true,
-            rooms: true
+            rooms: {
+              include :{
+                images : true
+              },
+            }
           }
         },
         users: {
