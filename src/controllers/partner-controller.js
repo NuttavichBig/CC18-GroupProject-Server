@@ -9,6 +9,7 @@ exports.getPartnerInfo = async (req, res, next) => {
         userId: id,
       },
       select: {
+        id : true,
         companyName: true,
         address: true,
         taxNo: true,
@@ -26,7 +27,6 @@ exports.getPartnerInfo = async (req, res, next) => {
         facilitiesHotel :true
       }
     })
-
     res.json({partner : partnerInfo, hotel : activeHotel});
   } catch (error) {
     next(error);
