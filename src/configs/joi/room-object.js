@@ -22,7 +22,7 @@ module.exports.createRoomSchema = Joi.object({
         .valid('SUITE', 'DOUBLE', 'MASTER')
         .required()
         .messages({
-            'any.only': 'Order by must be either "asc" or "desc"',
+            'any.only': 'Type by must be either SUITE, DOUBLE, MASTER',
             'string.base': 'Order by must be a string'
         }),
     price: Joi

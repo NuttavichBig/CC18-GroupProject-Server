@@ -237,7 +237,6 @@ exports.resetPassword = async (req, res, next) => {
     if (token !== req.user.resetPasswordToken) {
       return createError(400, "Your token is not for reset password")
     }
-
     // check password 
     const user = await prisma.user.findUnique({
       where: {
@@ -246,10 +245,14 @@ exports.resetPassword = async (req, res, next) => {
         password: true
       }
     })
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (isPasswordMatch) {
-      return createError(400, "You can't use old password");
+    if(user.password){
+
+      const isPasswordMatch = await bcrypt.compare(password, user.password);
+      if (isPasswordMatch) {
+        return createError(400, "You can't use old password");
+      }
     }
+
 
     // hash then change
     const hashPassword = await bcrypt.hash(password, 10);

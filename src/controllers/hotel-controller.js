@@ -282,7 +282,7 @@ exports.createHotel = async (req, res, next) => {
 exports.updateHotel = async (req, res, next) => {
     try {
         const { hotelId } = req.params
-        const { name, detail, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage } = req.input
+        // const { name, detail, address, lat, lng, star, checkinTime, checkoutTime, facilitiesHotel, phone, webPage } = req.input
 
         // check exist
         const hotel = await prisma.hotel.findUnique({
@@ -299,17 +299,28 @@ exports.updateHotel = async (req, res, next) => {
         if (!hotel) {
             return createError(404, "This hotel no longer exist")
         }
+        console.log(req.user.id)
+        console.log(hotel.partner.userId)
         // check owner
         if (req.user.id !== hotel.partner.userId) return createError(401, "You don't have permitted")
 
+
+        const {facilitiesHotel,...body} = req.input
+
+        body.facilitiesHotel = {
+            upsert : {
+                create : facilitiesHotel,
+                update : facilitiesHotel
+            }
+        }
+
         // image handle
-        let uploadedImg = null
         if (req.file) {
             const uploadedFile = await cloudinary.uploader.upload(req.file.path, {
                 overwrite: true,
                 public_id: path.parse(req.file.path).name
             })
-            uploadedImg = uploadedFile.secure_url
+            body.img = uploadedFile.secure_url
             fs.unlink(req.file.path)
             if (hotel.img) {
                 cloudinary.uploader.destroy(getPublicId(hotel.img))
@@ -317,25 +328,7 @@ exports.updateHotel = async (req, res, next) => {
         }
         const updatedHotel = await prisma.hotel.update({
             where: { id: Number(hotelId) },
-            data: {
-                name,
-                detail,
-                img: uploadedImg,
-                address,
-                lat,
-                lng,
-                star,
-                checkinTime,
-                checkoutTime,
-                phone,
-                webPage,
-                facilitiesHotel: {
-                    upsert: {
-                        create: facilitiesHotel,
-                        update: facilitiesHotel
-                    }
-                }
-            },
+            data: body,
             include:{
                 facilitiesHotel : true
             }
