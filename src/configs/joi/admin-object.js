@@ -1,5 +1,6 @@
 const Joi = require("joi")
-
+const startOfToday = new Date();
+startOfToday.setHours(0, 0, 0, 0)
 // admin path
 module.exports.adminGetUserQuerySchema = Joi.object({
     search: Joi
@@ -65,7 +66,7 @@ module.exports.adminGetUserQuerySchema = Joi.object({
 module.exports.adminUpdateUserSchema = Joi.object({
     role: Joi
         .string()
-        .valid('USER','ADMIN' ,'PARTNER')
+        .valid('USER', 'ADMIN', 'PARTNER')
         .required()
         .messages({
             "string.empty": "Email is required.",
@@ -167,11 +168,11 @@ module.exports.adminCreatePromotionSchema = Joi.object({
     discountValue: Joi
         .number()
         .precision(2)
-        .positive()
+        .min(0)
         .default(0)
         .messages({
             'number.base': 'Discount value must be a number',
-            'number.positive': 'Discount value must be greater than zero',
+            'number.min': 'Discount value must be at least 0',
         }),
     minimumSpend: Joi
         .number()
@@ -222,7 +223,7 @@ module.exports.adminCreatePromotionSchema = Joi.object({
     startDate: Joi
         .date()
         .iso()
-        .min('now')
+        .min(startOfToday)
         .required()
         .messages({
             'date.base': 'Start date must be a valid date.',
@@ -268,11 +269,11 @@ module.exports.adminUpdatePromotionSchema = Joi.object({
     discountValue: Joi
         .number()
         .precision(2)
-        .positive()
+        .min(0)
         .optional()
         .messages({
             'number.base': 'Discount value must be a number',
-            'number.positive': 'Discount value must be greater than zero',
+            'number.min': 'Discount value must be at least 0',
         }),
     minimumSpend: Joi
         .number()
@@ -321,7 +322,7 @@ module.exports.adminUpdatePromotionSchema = Joi.object({
     startDate: Joi
         .date()
         .iso()
-        .min('now')
+        .min(startOfToday)
         .optional()
         .messages({
             'date.base': 'Start date must be a valid date.',
@@ -338,15 +339,15 @@ module.exports.adminUpdatePromotionSchema = Joi.object({
         }),
 })
 module.exports.adminUpdateBookingSchema = Joi.object({
-    status : Joi
-    .string()
-    .valid(  "PENDING","CONFIRMED","CANCELED","FAILED","REFUND")
-    .required()
-    .messages({
-        'string.base': 'Status must be a string',
-        'any.only': 'Status must be one of "PENDING","CONFIRMED","CANCELED","FAILED" or "REFUND"',
+    status: Joi
+        .string()
+        .valid("PENDING", "CONFIRMED", "CANCELED", "FAILED", "REFUND")
+        .required()
+        .messages({
+            'string.base': 'Status must be a string',
+            'any.only': 'Status must be one of "PENDING","CONFIRMED","CANCELED","FAILED" or "REFUND"',
             'any.required': 'Status is required'
-    })
+        })
 })
 
 

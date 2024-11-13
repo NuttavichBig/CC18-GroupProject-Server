@@ -177,7 +177,7 @@ exports.getHotels = async (req, res, next) => {
 
             // filter for data
             finalHotels = sortedHotels.map(hotel => {
-                const { reviews, rooms, ...data } = hotel
+                const { ...data } = hotel
                 return data
             })
         }
@@ -203,7 +203,17 @@ exports.getHotelById = async (req, res, next) => {
                         images : true
                     }
                 },
-                reviews: true
+                reviews: true,
+                reviews:{
+                    include:{
+                        user: {
+                            select:{
+                                firstName:true,
+                                lastName: true
+                            }
+                        } 
+                    }
+                }
             }
         })
 
