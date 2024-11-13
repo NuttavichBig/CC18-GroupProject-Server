@@ -270,7 +270,7 @@ module.exports.adminUpdatePromotionSchema = Joi.object({
         .number()
         .precision(2)
         .min(0)
-        .default(0)
+        .optional()
         .messages({
             'number.base': 'Discount value must be a number',
             'number.min': 'Discount value must be at least 0',
