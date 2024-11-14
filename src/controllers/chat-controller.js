@@ -45,6 +45,7 @@ module.exports.userChat = async (io, socket) => {
 
         socket.emit('joinComplete', ({ message: 'you have success join a chat' }))
         socket.removeAllListeners('message')
+        socket.removeAllListeners('read')
         socket.on('message', async (msg) => {
             const addMessage = await prisma.message.create({
                 data: {
@@ -73,6 +74,19 @@ module.exports.userChat = async (io, socket) => {
             })
             io.to('admin').emit('userMessage', { data: message })
             io.to(chatRoom.id).emit('message', { data: addMessage })
+        })
+        socket.on('read',async()=>{
+            const readMessage = await prisma.message.updateMany({
+                where : {
+                    chatboxId : chatRoom.id,
+                    isAdmin : true,
+                    isRead : false
+                },
+                data : {
+                    isRead : true
+                }
+            })
+            io.to('admin').to(chatRoom.id).emit('userRead',{data : readMessage})
         })
 
         // disconnect listener
@@ -188,6 +202,36 @@ module.exports.adminChat = async (io, socket) => {
                     })
                     io.to('admin').emit('userMessage', { data: message })
                     io.to(room.id).emit('message', { data: addMessage })
+                })
+                socket.on('read',async()=>{
+                    await prisma.message.updateMany({
+                        where : {
+                            chatboxId : room.id,
+                            isAdmin : false,
+                            isRead : false
+                        },
+                        data : {
+                            isRead : true
+                        }
+                    })
+                    const newRoom = await prisma.chatbox.findMany({
+                        include: {
+                            messages: {
+                                orderBy: {
+                                    createdAt: 'desc',
+                                },
+                                take: 1, // Take only the latest message
+                            },
+                            user : {
+                                select : {
+                                    email : true,
+                                    image : true
+                                }
+                            }
+                        },
+                    })
+                    console.log(newRoom.messages)
+                    io.to('admin').emit('adminRead',{data : newRoom})
                 })
                 socket.on('leaveRoom', () => {
                     socket.leave(room.id)
