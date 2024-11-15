@@ -75,8 +75,8 @@ exports.getHotels = async (req, res, next) => {
                     }
                     return false
                 })
-                if(nearbyHotels.length === 0){
-                    return res.json({hotels : nearbyHotels})
+                if (nearbyHotels.length === 0) {
+                    return res.json({ hotels: nearbyHotels })
                 }
             }
 
@@ -109,14 +109,14 @@ exports.getHotels = async (req, res, next) => {
                             availableRoom--
                             break;
                         }
-                        if(guest){
-                            if(guest > room.recommendPeople){
+                        if (guest) {
+                            if (guest > room.recommendPeople) {
                                 availableRoom--
                                 break;
                             }
                         }
-                        if(roomType){
-                            if(roomType !== room.type){
+                        if (roomType) {
+                            if (roomType !== room.type) {
                                 availableRoom--
                                 break;
                             }
@@ -134,7 +134,7 @@ exports.getHotels = async (req, res, next) => {
                                     }
                                 }
                             })
-                            if (room.roomAmount - bookNo < roomAmount) {
+                            if (room.roomAmount - bookNo < roomAmount) { //ห้องทั้งหมดของhotel - จำนวนจองที่มีอยู่แล้ว < จำนวนห้องที่ผู้ใช้ต้องการจอง
                                 isAvailable = false
                                 break;
                             }
@@ -148,7 +148,7 @@ exports.getHotels = async (req, res, next) => {
                         hotel = null
                     }
                 }
-                hotels = hotels.filter(item => item !== null)
+                hotels = hotels.filter(item => item !== null) //เอาที่เป็นnull ออก
             }
 
 
@@ -182,8 +182,8 @@ exports.getHotels = async (req, res, next) => {
             })
         }
 
-        const skip = (page-1)*limit
-        const takeHotels = finalHotels.splice(skip,limit)
+        const skip = (page - 1) * limit
+        const takeHotels = finalHotels.splice(skip, limit)
         res.json({ hotels: takeHotels })
     } catch (error) {
         next(error)
@@ -200,7 +200,7 @@ exports.getHotelById = async (req, res, next) => {
                 rooms: {
                     include: {
                         facilitiesRoom: true,
-                        images : true
+                        images: true
                     }
                 },
                 reviews: true,
@@ -315,12 +315,12 @@ exports.updateHotel = async (req, res, next) => {
         if (req.user.id !== hotel.partner.userId) return createError(401, "You don't have permitted")
 
 
-        const {facilitiesHotel,...body} = req.input
+        const { facilitiesHotel, ...body } = req.input
 
         body.facilitiesHotel = {
-            upsert : {
-                create : facilitiesHotel,
-                update : facilitiesHotel
+            upsert: {
+                create: facilitiesHotel,
+                update: facilitiesHotel
             }
         }
 
@@ -339,8 +339,8 @@ exports.updateHotel = async (req, res, next) => {
         const updatedHotel = await prisma.hotel.update({
             where: { id: Number(hotelId) },
             data: body,
-            include:{
-                facilitiesHotel : true
+            include: {
+                facilitiesHotel: true
             }
         })
         res.json(updatedHotel)
