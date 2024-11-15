@@ -150,6 +150,19 @@ exports.createBooking = async (req, res, next) => {
       userHavePromotionId = userPromotion.id;
     }
 
+    const room = await prisma.room.findUnique({
+      where : {
+        id : +roomId
+      },
+      include : {
+        bookings : true
+      }
+    })
+    const bookedRoom = room.bookings.reduce((acc,curr)=>acc+curr.amountRoom,0)
+    console.log(bookedRoom)
+    if((room.roomAmount - bookedRoom) < amount){
+      return createError(400,'Room not enough')
+    }
     // Create the booking record
     const newBooking = await prisma.booking.create({
       data: {
