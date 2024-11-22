@@ -110,7 +110,7 @@ exports.getAllPartners = async (req, res, next) => {
             take: limit,
             skip: (page - 1) * limit,
             orderBy: { [sortBy]: orderBy },
-            include: { hotels: true }
+            include: { hotels: { include: { rooms: { include: { images: true } } } } }
         }
 
         // check search
@@ -153,34 +153,43 @@ exports.updatePartnerStatus = async (req, res, next) => {
         }
 
         // check have create hotel?
-        if(status === "ACTIVE" && partner.status === "PENDING"){
+        if (status === "ACTIVE" && partner.status === "PENDING") {
             const hotel = await prisma.hotel.findFirst({
-                where : {
-                    partnerId : partner.id
+                where: {
+                    partnerId: partner.id
                 }
             })
-            if(!hotel){
-                return createError(401,"This partner need to create hotel before got approve")
+            if (!hotel) {
+                return createError(401, "This partner need to create hotel before got approve")
             }
             // create hotel
             await prisma.hotel.update({
-                where : {
-                    id : hotel.id
+                where: {
+                    id: hotel.id
                 },
-                data : {
-                    isActive : true
+                data: {
+                    isActive: true
                 }
             })
             await prisma.user.update({
-                where : {
-                    id :partner.userId
+                where: {
+                    id: partner.userId
                 },
-                data : {
-                    role : "PARTNER"
+                data: {
+                    role: "PARTNER"
                 }
             })
         }
 
+        if (status === "BANNED") {
+            await prisma.hotel.updateMany({
+                where: {
+                    partnerId: partner.id
+                }, data: {
+                    isActive: false
+                }
+            })
+        }
         // update partner
         const updatePartner = await prisma.partner.update({
             where: {
@@ -190,7 +199,7 @@ exports.updatePartnerStatus = async (req, res, next) => {
                 status
             }
         })
-       
+
         res.json({ message: 'Update success', partner: updatePartner })
 
     } catch (error) {
@@ -272,27 +281,27 @@ exports.updatePromotion = async (req, res, next) => {
 }
 exports.deletePromotion = async (req, res, next) => {
     try {
-        const {promotionId} =req.params
+        const { promotionId } = req.params
         //check exist
         const promotion = await prisma.promotion.findUnique({
             where: {
                 id: +promotionId
             }
         })
-        if(!promotion) {
+        if (!promotion) {
             return createError(400, "Promotion not found")
-        }   
-        
-        if(promotion.img){
+        }
+
+        if (promotion.img) {
             cloudinary.uploader.destroy(getPublicId(promotion.img))
             console.log("Delete image from cloud")
         }
         const deletedPromotion = await prisma.promotion.delete({
-            where:{
-                id : promotion.id
+            where: {
+                id: promotion.id
             }
         })
-        res.json({message : "Delete success",promotion :deletedPromotion})
+        res.json({ message: "Delete success", promotion: deletedPromotion })
     } catch (err) {
         next(err)
     }
@@ -306,12 +315,12 @@ exports.updateBookingStatus = async (req, res, next) => {
 
         //check exist
         const booking = await prisma.booking.findUnique({
-            where :{
-                id : +bookingId
+            where: {
+                id: +bookingId
             }
         })
-        if(!booking){
-            return createError(400,"Booking not found")
+        if (!booking) {
+            return createError(400, "Booking not found")
         }
         const updateBooking = await prisma.booking.update({
             where: {
@@ -321,7 +330,7 @@ exports.updateBookingStatus = async (req, res, next) => {
                 status
             }
         })
-        res.json({message : "Update booking success",booking : updateBooking})
+        res.json({ message: "Update booking success", booking: updateBooking })
     } catch (error) {
         next(error)
     }
